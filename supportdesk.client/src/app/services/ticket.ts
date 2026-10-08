@@ -14,9 +14,13 @@ export interface Ticket {
 
 @Service()
 export class TicketService {
-    private http = inject(HttpClient);
+  private http = inject(HttpClient);
 
-    getTickets(): Observable<Ticket[]> {
+  getTickets(): Observable<Ticket[]> {
     return this.http.get<Ticket[]>('/api/tickets');
   }
+  getTicket(id: number): Observable<Ticket> {
+    return this.http.get<Ticket>(`/api/tickets/${id}`); 
+  }
+
 }
