@@ -1,0 +1,28 @@
+<h1 id="tableLabel">Tickets</h1>
+
+<p *ngIf="!tickets()"><em>Loading...</em></p>
+
+
+<table *ngIf="tickets()">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Ticket Number</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Created At</th>
+        </tr>
+    </thead>    
+    <tbody>  
+        <tr *ngFor="let ticket of tickets()">
+            <td>{{ ticket.id }}</td>
+            <td><a [routerLink]="['/tickets', ticket.id]">{{ ticket.ticketNumber }}</a></td>
+            <td>{{ ticket.subject }}</td>
+            <td>{{ ticket.status }}</td>
+            <td>{{ ticket.priority }}</td>
+            <td>{{ ticket.createdAt | date:'dd-MMM-yyyy HH:mm' }}</td>
+        </tr>
+    </tbody>
+</table>
+

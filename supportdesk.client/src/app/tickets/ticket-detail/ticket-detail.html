@@ -1,0 +1,10 @@
+<p><a routerLink="/tickets">← Back to tickets</a></p>
+
+<p *ngIf="notFound()">Ticket not found.</p>
+
+<div *ngIf="ticketDetail() as t">
+  <h2>{{ t.ticketNumber }}: {{ t.subject }}</h2>
+  <p><strong>Status:</strong> {{ t.status }}</p>
+  <p><strong>Priority:</strong> {{ t.priority }}</p>
+  <p><strong>Created:</strong> {{ t.createdAt | date:'dd-MMM-yyyy HH:mm' }}</p>
+</div>  

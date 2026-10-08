@@ -10,25 +10,8 @@ import { Ticket, TicketService } from './services/ticket';
   templateUrl: './app.html',
 })
 
-export class App implements OnInit {
-  //public forecasts: WeatherForecast[] = [];
-  //public forecasts = signal<WeatherForecast[] | null>(null);
-  //public tickets = signal<Ticket [] | null>(null);
-  private ticketService = inject(TicketService);
-
-  tickets = signal<Ticket [] | null>(null);
-
-  //constructor(private http: HttpClient) {}
-
-  ngOnInit() {
-    this.ticketService.getTickets().subscribe({
-      next: result => this.tickets.set(result), 
-      error: err => console.error(err)
-    });
-  }
-
-
-  
+export class App {
+    
 
   protected readonly title = signal('supportdesk.client');
 }
