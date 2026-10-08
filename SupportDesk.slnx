@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="supportdesk.client/supportdesk.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="SupportDesk.Server/SupportDesk.Server.csproj" />
+</Solution>
