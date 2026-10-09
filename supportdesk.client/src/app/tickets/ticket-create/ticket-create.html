@@ -1,0 +1,36 @@
+<h2>New ticket</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div>
+    <label for="subject">Subject</label><br>
+    <input id="subject" formControlName="subject">
+    <div *ngIf="form.controls.subject.touched && form.controls.subject.errors?.['required']">
+      Subject is required.
+    </div>
+    <div *ngIf="form.controls.subject.errors?.['maxlength']">
+      Subject must be 200 characters or fewer.
+    </div>
+  </div>
+
+  <div>
+    <label for="description">Description</label><br>
+    <textarea id="description" formControlName="description" rows="5"></textarea>
+    <div *ngIf="form.controls.description.touched && form.controls.description.errors?.['required']">
+      Description is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="priority">Priority</label><br>
+    <select id="priority" formControlName="priority">
+      <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+    </select>
+  </div>
+
+  <p *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+  <button type="submit" [disabled]="saving()">
+    {{ saving() ? 'Saving...' : 'Create ticket' }}
+  </button>
+  <a routerLink="/tickets">Cancel</a>
+</form>
