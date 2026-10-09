@@ -6,10 +6,10 @@ import { App } from './app';
 import { TicketList } from './tickets/ticket-list/ticket-list';
 import { TicketDetail } from './tickets/ticket-detail/ticket-detail';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TicketCreate } from './tickets/ticket-create/ticket-create';
+import { TicketForm } from './tickets/ticket-form/ticket-form';
 
 @NgModule({
-  declarations: [App, TicketList, TicketDetail, TicketCreate],
+  declarations: [App, TicketList, TicketDetail, TicketForm],
   imports: [BrowserModule, HttpClientModule, AppRoutingModule, ReactiveFormsModule],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
