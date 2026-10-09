@@ -1,6 +1,8 @@
-<h2>New ticket</h2>
+<h2>{{ isEdit ? 'Edit ticket' : 'New ticket' }}</h2>
 
-<form [formGroup]="form" (ngSubmit)="submit()">
+<p *ngIf="loading()">Loading...</p>
+
+<form *ngIf="!loading()" [formGroup]="form" (ngSubmit)="submit()">
   <div>
     <label for="subject">Subject</label><br>
     <input id="subject" formControlName="subject">
@@ -27,10 +29,17 @@
     </select>
   </div>
 
+  <div *ngIf="isEdit">
+    <label for="status">Status</label><br>
+    <select id="status" formControlName="status">
+      <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
   <p *ngIf="errorMessage()">{{ errorMessage() }}</p>
 
   <button type="submit" [disabled]="saving()">
-    {{ saving() ? 'Saving...' : 'Create ticket' }}
+    {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Create ticket') }}
   </button>
-  <a routerLink="/tickets">Cancel</a>
+  <a [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
 </form>

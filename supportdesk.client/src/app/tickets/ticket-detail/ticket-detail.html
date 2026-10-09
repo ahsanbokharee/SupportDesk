@@ -3,6 +3,7 @@
 <p *ngIf="notFound()">Ticket not found.</p>
 
 <div *ngIf="ticketDetail() as t">
+  <p><a [routerLink]="['/tickets', t.id, 'edit']">Edit</a></p>
   <h2>{{ t.ticketNumber }}: {{ t.subject }}</h2>
   <p><strong>Description:</strong> {{ t.description }}</p>
   <p><strong>Status:</strong> {{ t.status }}</p>

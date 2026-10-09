@@ -18,6 +18,12 @@ export interface CreateTicket {
   priority: string
 }
 
+export interface UpdateTicket {
+  subject: string;
+  description: string;
+  priority: string;
+  status: string;
+}
 
 @Service()
 export class TicketService {
@@ -27,10 +33,13 @@ export class TicketService {
     return this.http.get<Ticket[]>('/api/tickets');
   }
   getTicket(id: number): Observable<Ticket> {
-    return this.http.get<Ticket>(`/api/tickets/${id}`); 
+    return this.http.get<Ticket>(`/api/tickets/${id}`);
   }
   createTicket(ticket: CreateTicket): Observable<Ticket> {
     return this.http.post<Ticket>('/api/tickets', ticket);
+  }
+  updateTicket(id: number, ticket: UpdateTicket): Observable<Ticket> {
+    return this.http.put<Ticket>(`/api/tickets/${id}`, ticket);
   }
 
 }
