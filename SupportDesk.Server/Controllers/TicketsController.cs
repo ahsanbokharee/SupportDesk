@@ -3,6 +3,7 @@ using SupportDesk.Server.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SupportDesk.Server.Dtos;
 
 namespace SupportDesk.Server.Controllers
 {
@@ -37,6 +38,26 @@ namespace SupportDesk.Server.Controllers
             }
 
             return Ok(ticket);
+        }
+        [HttpPost]
+        public async Task<ActionResult<Ticket>> Create(CreateTicketDto dto)
+        {
+            var ticket = new Ticket
+            {
+                Subject = dto.Subject,
+                Description = dto.Description,
+                Priority = dto.Priority,
+                Status = "Open",
+                CreatedAt = DateTime.UtcNow
+            };
+            
+            _db.Tickets.Add(ticket);
+            await _db.SaveChangesAsync();
+
+            ticket.TicketNumber = $"TCK-{1000 + ticket.Id}";
+            await _db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetById), new {id = ticket.Id}, ticket);
         }
 
     }

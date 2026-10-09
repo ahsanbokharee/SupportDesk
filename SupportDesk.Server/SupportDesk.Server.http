@@ -1,6 +1,21 @@
-@SupportDesk.Server_HostAddress = http://localhost:5192
+@baseUrl = https://localhost:7053
 
-GET {{SupportDesk.Server_HostAddress}}/weatherforecast/
-Accept: application/json
+### Valid ticket
+POST {{baseUrl}}/api/tickets
+Content-Type: application/json
 
-###
+{
+  "subject": "Printer not working",
+  "description": "The office printer shows a paper jam error.",
+  "priority": "Medium"
+}
+
+### Invalid ticket
+POST {{baseUrl}}/api/tickets
+Content-Type: application/json
+
+{
+  "subject": "",
+  "description": "Missing subject and bad priority",
+  "priority": "Urgent"
+}

@@ -6,9 +6,16 @@ export interface Ticket {
   id: number,
   ticketNumber: string,
   subject: string,
+  description: string,
   status: string,
   priority: string,
   createdAt: Date
+}
+
+export interface CreateTicket {
+  subject: string,
+  description: string,
+  priority: string
 }
 
 
@@ -21,6 +28,9 @@ export class TicketService {
   }
   getTicket(id: number): Observable<Ticket> {
     return this.http.get<Ticket>(`/api/tickets/${id}`); 
+  }
+  createTicket(ticket: CreateTicket): Observable<Ticket> {
+    return this.http.post<Ticket>('/api/tickets', ticket);
   }
 
 }
