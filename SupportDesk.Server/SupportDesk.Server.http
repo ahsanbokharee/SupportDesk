@@ -19,3 +19,36 @@ Content-Type: application/json
   "description": "Missing subject and bad priority",
   "priority": "Urgent"
 }
+
+### Update a ticket
+PUT {{baseUrl}}/api/tickets/1
+Content-Type: application/json
+
+{
+  "subject": "Unable to log in (updated)",
+  "description": "Login page says invalid password, even after reset.",
+  "priority": "High",
+  "status": "In Progress"
+}
+
+### Update a ticket that doesn't exist
+PUT {{baseUrl}}/api/tickets/999
+Content-Type: application/json
+
+{
+  "subject": "Test",
+  "description": "Test",
+  "priority": "Low",
+  "status": "Open"
+}
+
+### Update with an invalid status
+PUT {{baseUrl}}/api/tickets/1
+Content-Type: application/json
+
+{
+  "subject": "Test",
+  "description": "Test",
+  "priority": "Low",
+  "status": "Done"
+}

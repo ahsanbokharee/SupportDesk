@@ -1,9 +1,7 @@
-using SupportDesk.Server.Data;
 using SupportDesk.Server.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SupportDesk.Server.Dtos;
+using SupportDesk.Server.Services;
 
 namespace SupportDesk.Server.Controllers
 {
@@ -11,53 +9,45 @@ namespace SupportDesk.Server.Controllers
     [ApiController]
     public class TicketsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly ITicketService _ticketService;
 
-        public TicketsController(AppDbContext db)
+        public TicketsController(ITicketService ticketService)
         {
-            _db = db;
+            _ticketService = ticketService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ticket>>> Get()
         {
-            var tickets = await _db.Tickets
-                    .OrderBy(t => t.Id)
-                    .ToListAsync();
-
-
-            return Ok(tickets);
+            return Ok(await _ticketService.GetAllAsync());
         }
-        [HttpGet("{Id}")]
-        public async Task<ActionResult<Ticket>> GetById(int Id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Ticket>> GetById(int id)
         {
-            var ticket = await _db.Tickets.FindAsync(Id);
+            var ticket = await _ticketService.GetByIdAsync(id);
             if (ticket == null)
             {
                 return NotFound();
             }
-
             return Ok(ticket);
         }
         [HttpPost]
         public async Task<ActionResult<Ticket>> Create(CreateTicketDto dto)
         {
-            var ticket = new Ticket
+
+            var ticket = await _ticketService.CreateAsync(dto);
+
+            return CreatedAtAction(nameof(GetById), new { id = ticket.Id }, ticket);
+        }
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Ticket>> Update(int id, UpdateTicketDto dto)
+        {
+            var ticket = await _ticketService.UpdateAsync(id, dto);
+            if (ticket == null)
             {
-                Subject = dto.Subject,
-                Description = dto.Description,
-                Priority = dto.Priority,
-                Status = "Open",
-                CreatedAt = DateTime.UtcNow
-            };
-            
-            _db.Tickets.Add(ticket);
-            await _db.SaveChangesAsync();
-
-            ticket.TicketNumber = $"TCK-{1000 + ticket.Id}";
-            await _db.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new {id = ticket.Id}, ticket);
+                return NotFound();
+            }
+            return Ok(ticket);
         }
 
     }
