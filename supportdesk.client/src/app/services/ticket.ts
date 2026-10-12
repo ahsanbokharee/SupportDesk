@@ -39,6 +39,8 @@ export interface TicketQuery {
   priority?: string;
   page?: number;
   pageSize?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
 }
 
 @Service()

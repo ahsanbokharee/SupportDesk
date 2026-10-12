@@ -22,6 +22,8 @@ export class TicketList implements OnInit {
 
   result = signal<PagedResult<Ticket> | null>(null);
   page = signal(1);
+  sortBy = signal('createdAt');
+  sortDir = signal<'asc' | 'desc'>('desc');
   loading = signal(false);
   errorMessage = signal<string | null>(null);
 
@@ -51,6 +53,8 @@ export class TicketList implements OnInit {
         ...this.filters.getRawValue(),
         page: this.page(),
         pageSize: this.pageSize,
+        sortBy: this.sortBy(),
+        sortDir: this.sortDir(),
       })
       .subscribe({
         next: result => {
@@ -72,5 +76,23 @@ export class TicketList implements OnInit {
 
   clearFilters() {
     this.filters.reset();
+  }
+  
+  sort(column: string) {
+    if (this.sortBy() === column) {
+      this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortBy.set(column);
+      this.sortDir.set(column === 'subject' ? 'asc' : 'desc');
+    }
+    this.page.set(1);
+    this.load();
+  }
+
+  sortIndicator(column: string): string {
+    if (this.sortBy() !== column) {
+      return '';
+    }
+    return this.sortDir() === 'asc' ? ' ▲' : ' ▼';
   }
 }
