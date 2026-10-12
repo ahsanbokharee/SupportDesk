@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -25,12 +25,36 @@ export interface UpdateTicket {
   status: string;
 }
 
+export interface PagedResult<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+export interface TicketQuery {
+  search?: string;
+  status?: string;
+  priority?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 @Service()
 export class TicketService {
   private http = inject(HttpClient);
 
-  getTickets(): Observable<Ticket[]> {
-    return this.http.get<Ticket[]>('/api/tickets');
+  getTickets(query: TicketQuery = {}): Observable<PagedResult<Ticket>> {
+    let params = new HttpParams();
+
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value);
+      }
+    }
+
+    return this.http.get<PagedResult<Ticket>>('/api/tickets', { params });
   }
   getTicket(id: number): Observable<Ticket> {
     return this.http.get<Ticket>(`/api/tickets/${id}`);
