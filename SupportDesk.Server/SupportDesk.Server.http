@@ -70,3 +70,13 @@ GET {{baseUrl}}/api/tickets?pageSize=500
 
 ### Unknown status (expect 400)
 GET {{baseUrl}}/api/tickets?status=Waiting
+
+
+### Sort by priority, highest first
+GET {{baseUrl}}/api/tickets?sortBy=priority&sortDir=desc
+
+### Sort by subject A-Z
+GET {{baseUrl}}/api/tickets?sortBy=subject&sortDir=asc
+
+### Invalid sort column (expect 400)
+GET {{baseUrl}}/api/tickets?sortBy=description

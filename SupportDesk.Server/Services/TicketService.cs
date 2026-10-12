@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SupportDesk.Server.Data;
 using SupportDesk.Server.Dtos;
@@ -37,8 +38,24 @@ public class TicketService : ITicketService
 
         var totalCount = await tickets.CountAsync();
 
-        var items = await tickets
-            .OrderByDescending(t => t.CreatedAt)
+        var descending = query.SortDir != "asc";
+
+        var sorted = query.SortBy switch
+        {
+            "priority" => SortTickets(tickets,
+                t => t.Priority == "High" ? 3 : t.Priority == "Medium" ? 2 : 1,
+                descending),
+            "status" => SortTickets(tickets,
+                t => t.Status == "Open" ? 1
+                   : t.Status == "In Progress" ? 2
+                   : t.Status == "Resolved" ? 3 : 4,
+                descending),
+            "subject" => SortTickets(tickets, t => t.Subject, descending),
+            _ => SortTickets(tickets, t => t.CreatedAt, descending),
+        };
+
+        var items = await sorted
+            .ThenByDescending(t => t.Id)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync();
@@ -92,5 +109,13 @@ public class TicketService : ITicketService
 
         await _db.SaveChangesAsync();
         return ticket;
+    }
+
+    private static IOrderedQueryable<Ticket> SortTickets<TKey>(
+        IQueryable<Ticket> tickets,
+        Expression<Func<Ticket, TKey>> key,
+        bool descending)
+    {
+        return descending ? tickets.OrderByDescending(key) : tickets.OrderBy(key);
     }
 }
