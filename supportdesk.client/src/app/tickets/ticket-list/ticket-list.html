@@ -1,28 +1,57 @@
-<h1 id="tableLabel">Tickets</h1>
-
-<p *ngIf="!tickets()"><em>Loading...</em></p>
-
 <p><a routerLink="/tickets/new">+ New ticket</a></p>
-<table *ngIf="tickets()">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Ticket Number</th>
-            <th>Subject</th>
-            <th>Status</th>
-            <th>Priority</th>
-            <th>Created At</th>
-        </tr>
-    </thead>    
-    <tbody>  
-        <tr *ngFor="let ticket of tickets()">
-            <td>{{ ticket.id }}</td>
-            <td><a [routerLink]="['/tickets', ticket.id]">{{ ticket.ticketNumber }}</a></td>
-            <td>{{ ticket.subject }}</td>
-            <td>{{ ticket.status }}</td>
-            <td>{{ ticket.priority }}</td>
-            <td>{{ ticket.createdAt | date:'dd-MMM-yyyy HH:mm' }}</td>
-        </tr>
-    </tbody>
-</table>
 
+<form [formGroup]="filters">
+    <input formControlName="search" placeholder="Search subject or number">
+
+    <select formControlName="status">
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+    </select>
+
+    <select formControlName="priority">
+        <option value="">All priorities</option>
+        <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+    </select>
+
+    <button type="button" (click)="clearFilters()">Clear</button>
+</form>
+
+<p *ngIf="errorMessage()">{{ errorMessage() }}</p>
+<p *ngIf="loading() && !result()"><em>Loading...</em></p>
+
+<ng-container *ngIf="result() as r">
+    <p *ngIf="r.totalCount === 0">No tickets match these filters.</p>
+
+    <table *ngIf="r.totalCount > 0">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ticket Number</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let ticket of r.items">
+                <td>{{ ticket.id }}</td>
+                <td><a [routerLink]="['/tickets', ticket.id]">{{ ticket.ticketNumber }}</a></td>
+                <td>{{ ticket.subject }}</td>
+                <td>{{ ticket.status }}</td>
+                <td>{{ ticket.priority }}</td>
+                <td>{{ ticket.createdAt | date:'dd-MMM-yyyy HH:mm' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="r.totalPages > 1">
+        <button type="button" [disabled]="r.page <= 1" (click)="goToPage(r.page - 1)">
+            Previous
+        </button>
+        Page {{ r.page }} of {{ r.totalPages }} ({{ r.totalCount }} tickets)
+        <button type="button" [disabled]="r.page >= r.totalPages" (click)="goToPage(r.page + 1)">
+            Next
+        </button>
+    </div>
+</ng-container>

@@ -6,7 +6,7 @@ namespace SupportDesk.Server.Services;
 
 public interface ITicketService
 {
-    Task<List<Ticket>> GetAllAsync();
+    Task<PagedResult<Ticket>> GetAllAsync(TicketQuery query);
     Task<Ticket?> GetByIdAsync(int id);
     Task<Ticket> CreateAsync(CreateTicketDto dto);
     Task<Ticket?> UpdateAsync(int id, UpdateTicketDto dto);
