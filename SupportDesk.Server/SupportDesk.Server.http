@@ -52,3 +52,21 @@ Content-Type: application/json
   "priority": "Low",
   "status": "Done"
 }
+
+### All tickets, first page
+GET {{baseUrl}}/api/tickets
+
+### Search
+GET {{baseUrl}}/api/tickets?search=login
+
+### Filter and page
+GET {{baseUrl}}/api/tickets?status=Open&priority=High&page=1&pageSize=5
+
+### Status with a space
+GET {{baseUrl}}/api/tickets?status=In%20Progress
+
+### Page size too large (expect 400)
+GET {{baseUrl}}/api/tickets?pageSize=500
+
+### Unknown status (expect 400)
+GET {{baseUrl}}/api/tickets?status=Waiting

@@ -14,9 +14,42 @@ public class TicketService : ITicketService
         _db = db;
     }
 
-    public async Task<List<Ticket>> GetAllAsync()
+    public async Task<PagedResult<Ticket>> GetAllAsync(TicketQuery query)
     {
-        return await _db.Tickets.OrderBy(t => t.Id).ToListAsync();
+        IQueryable<Ticket> tickets = _db.Tickets;
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var search = query.Search.Trim();
+            tickets = tickets.Where(t =>
+                t.Subject.Contains(search) || t.TicketNumber.Contains(search));
+        }
+
+        if (!string.IsNullOrEmpty(query.Status))
+        {
+            tickets = tickets.Where(t => t.Status == query.Status);
+        }
+
+        if (!string.IsNullOrEmpty(query.Priority))
+        {
+            tickets = tickets.Where(t => t.Priority == query.Priority);
+        }
+
+        var totalCount = await tickets.CountAsync();
+
+        var items = await tickets
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync();
+
+        return new PagedResult<Ticket>
+        {
+            Items = items,
+            Page = query.Page,
+            PageSize = query.PageSize,
+            TotalCount = totalCount
+        };
     }
 
     public async Task<Ticket?> GetByIdAsync(int id)

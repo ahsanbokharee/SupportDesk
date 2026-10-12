@@ -17,10 +17,11 @@ namespace SupportDesk.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Ticket>>> Get()
+        public async Task<ActionResult<PagedResult<Ticket>>> Get([FromQuery] TicketQuery query)
         {
-            return Ok(await _ticketService.GetAllAsync());
+            return Ok(await _ticketService.GetAllAsync(query));
         }
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<Ticket>> GetById(int id)
         {
