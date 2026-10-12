@@ -27,10 +27,10 @@
             <tr>
                 <th>Id</th>
                 <th>Ticket Number</th>
-                <th>Subject</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Created At</th>
+                <th (click)="sort('subject')" class="sortable">Subject{{ sortIndicator('subject') }}</th>
+                <th (click)="sort('status')" class="sortable">Status{{ sortIndicator('status') }}</th>
+                <th (click)="sort('priority')" class="sortable">Priority{{ sortIndicator('priority') }}</th>
+                <th (click)="sort('createdAt')" class="sortable">Created At{{ sortIndicator('createdAt') }}</th>
             </tr>
         </thead>
         <tbody>

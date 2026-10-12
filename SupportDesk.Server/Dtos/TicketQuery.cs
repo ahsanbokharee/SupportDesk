@@ -18,4 +18,9 @@ public class TicketQuery
 
     [Range(1, 100)]
     public int PageSize { get; set; } = 10;
+    [AllowedValues(null, "createdAt", "priority", "status", "subject")]
+    public string? SortBy { get; set; }
+
+    [AllowedValues(null, "asc", "desc")]
+    public string? SortDir { get; set; }
 }
