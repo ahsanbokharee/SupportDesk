@@ -116,3 +116,34 @@ Content-Type: application/json
   "email": "agent",
   "password": "Password123!"
 }
+
+
+
+
+### Login as agent
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "agent@supportdesk.local",
+  "password": "Password123!"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### Tickets WITHOUT a token (expect 401)
+GET {{baseUrl}}/api/tickets
+
+### Tickets WITH a token (expect 200)
+GET {{baseUrl}}/api/tickets
+Authorization: Bearer {{token}}
+
+### Who am I
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### Tampered token (expect 401)
+GET {{baseUrl}}/api/tickets
+Authorization: Bearer {{token}}x

@@ -2,11 +2,13 @@ using SupportDesk.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using SupportDesk.Server.Dtos;
 using SupportDesk.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SupportDesk.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TicketsController : ControllerBase
     {
         private readonly ITicketService _ticketService;
