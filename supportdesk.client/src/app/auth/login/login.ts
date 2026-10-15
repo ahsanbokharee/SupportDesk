@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +13,7 @@ export class Login {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   submitting = signal(false);
   errorMessage = signal<string | null>(null);
@@ -34,7 +35,10 @@ export class Login {
     const { email, password } = this.form.getRawValue();
 
     this.auth.login(email, password).subscribe({
-      next: () => this.router.navigate(['/tickets']),
+      next: () => {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/tickets';
+        this.router.navigateByUrl(returnUrl);
+      },
       error: err => {
         this.submitting.set(false);
         this.errorMessage.set(
@@ -44,5 +48,5 @@ export class Login {
         );
       }
     });
-  }  
+  }
 }

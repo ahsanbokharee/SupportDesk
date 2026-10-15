@@ -4,14 +4,21 @@ import { TicketList } from './tickets/ticket-list/ticket-list';
 import { TicketDetail } from './tickets/ticket-detail/ticket-detail';
 import { TicketForm } from './tickets/ticket-form/ticket-form';
 import { Login } from './auth/login/login';
+import { authGuard } from './services/auth-guard';
 
 const routes: Routes = [
-  {path: '', redirectTo:'tickets', pathMatch:'full'},
+  { path: '', redirectTo: 'tickets', pathMatch: 'full' },
   { path: 'login', component: Login },
-  {path:'tickets', component: TicketList},
-  {path:'tickets/new', component: TicketForm},
-  {path:'tickets/:id/edit', component: TicketForm},
-  {path:'tickets/:id', component: TicketDetail}  
+  {
+    path: 'tickets',
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: TicketList },
+      { path: 'new', component: TicketForm },
+      { path: ':id/edit', component: TicketForm },
+      { path: ':id', component: TicketDetail }
+    ]
+  },
 ];
 
 @NgModule({
