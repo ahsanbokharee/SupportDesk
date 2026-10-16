@@ -26,7 +26,7 @@ public class UsersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDto>> GetById(int id)
     {
-        var user = _userService.GetByIdAsync(id);
+        var user = await _userService.GetByIdAsync(id);
         
         if (user is null)
         {
@@ -45,7 +45,7 @@ public class UsersController : ControllerBase
         var user = await _userService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById),new { id = user.Id }, user);
     }
-    [HttpPut]
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<UserDto>> Update(int id, UpdateUserDto dto)
     {
         var currentUserId = int.Parse(User.FindFirstValue("sub")!);
