@@ -20,6 +20,7 @@ export class AuthService {
 
   currentUser = this.session.asReadonly();
   isLoggedIn = computed(() => this.session() !== null);
+  isAdmin = computed(() => this.session()?.role === 'Admin');
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
