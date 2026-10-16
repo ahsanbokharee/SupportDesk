@@ -9,12 +9,16 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { TicketForm } from './tickets/ticket-form/ticket-form';
 import { Login } from './auth/login/login';
 import { authInterceptor } from './services/auth-interceptor';
-
+import { UserList } from './users/user-list/user-list';
+import { UserForm } from './users/user-form/user-form';
 
 @NgModule({
-  declarations: [App, TicketList, TicketDetail, TicketForm, Login],
+  declarations: [App, TicketList, TicketDetail, TicketForm, Login, UserList, UserForm],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
-  providers: [provideBrowserGlobalErrorListeners(),  provideHttpClient(withInterceptors([authInterceptor]))],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideHttpClient(withInterceptors([authInterceptor])),
+  ],
   bootstrap: [App],
- })
+})
 export class AppModule {}

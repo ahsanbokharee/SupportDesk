@@ -4,7 +4,7 @@ import { AuthService } from './auth';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
-  const router = inject(Router)
+  const router = inject(Router);
 
   if (auth.isLoggedIn()) {
     return true;
@@ -13,5 +13,16 @@ export const authGuard: CanActivateFn = (route, state) => {
   return router.createUrlTree(['/login'], {
     queryParams: { returnUrl: state.url },
   });
+
+};
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (auth.isAdmin()) {
+    return true;
+  }
+
+  return router.createUrlTree(['/tickets']);
 
 };

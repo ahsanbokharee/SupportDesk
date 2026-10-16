@@ -147,3 +147,79 @@ Authorization: Bearer {{token}}
 ### Tampered token (expect 401)
 GET {{baseUrl}}/api/tickets
 Authorization: Bearer {{token}}x
+
+
+
+
+
+
+
+
+
+### Login as admin
+# @name adminLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@supportdesk.local", "password": "Password123!" }
+
+### Login as agent
+# @name agentLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "agent@supportdesk.local", "password": "Password123!" }
+
+###
+@adminToken = {{adminLogin.response.body.token}}
+@agentToken = {{agentLogin.response.body.token}}
+
+### List users as admin (expect 200)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+
+### List users as agent (expect 403)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{agentToken}}
+
+### List users without a token (expect 401)
+GET {{baseUrl}}/api/users
+
+### Create a user
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Maria",
+  "lastName": "Agent",
+  "email": "maria@supportdesk.local",
+  "password": "Welcome123!",
+  "role": "Agent"
+}
+
+### Duplicate email (expect 409)
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Copy",
+  "lastName": "User",
+  "email": "agent@supportdesk.local",
+  "password": "Welcome123!",
+  "role": "Customer"
+}
+
+### Admin tries to deactivate themselves (expect 400)
+PUT {{baseUrl}}/api/users/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Ahsan",
+  "lastName": "Admin",
+  "email": "admin@supportdesk.local",
+  "role": "Admin",
+  "isActive": false
+}
