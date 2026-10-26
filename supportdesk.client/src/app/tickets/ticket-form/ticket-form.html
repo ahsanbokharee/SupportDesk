@@ -1,45 +1,52 @@
 <h2>{{ isEdit ? 'Edit ticket' : 'New ticket' }}</h2>
 
-<p *ngIf="loading()">Loading...</p>
+@if (loading()) {
+  <p>Loading...</p>
+}
 
-<form *ngIf="!loading()" [formGroup]="form" (ngSubmit)="submit()">
-  <div>
-    <label for="subject">Subject</label><br>
-    <input id="subject" formControlName="subject">
-    <div *ngIf="form.controls.subject.touched && form.controls.subject.errors?.['required']">
-      Subject is required.
+@if (!loading()) {
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div>
+      <label for="subject">Subject</label><br />
+      <input id="subject" formControlName="subject" />
+      @if (form.controls.subject.touched && form.controls.subject.errors?.['required']) {
+        <div>Subject is required.</div>
+      }
+      @if (form.controls.subject.errors?.['maxlength']) {
+        <div>Subject must be 200 characters or fewer.</div>
+      }
     </div>
-    <div *ngIf="form.controls.subject.errors?.['maxlength']">
-      Subject must be 200 characters or fewer.
+    <div>
+      <label for="description">Description</label><br />
+      <textarea id="description" formControlName="description" rows="5"></textarea>
+      @if (form.controls.description.touched && form.controls.description.errors?.['required']) {
+        <div>Description is required.</div>
+      }
     </div>
-  </div>
-
-  <div>
-    <label for="description">Description</label><br>
-    <textarea id="description" formControlName="description" rows="5"></textarea>
-    <div *ngIf="form.controls.description.touched && form.controls.description.errors?.['required']">
-      Description is required.
+    <div>
+      <label for="priority">Priority</label><br />
+      <select id="priority" formControlName="priority">
+        @for (p of priorities; track p) {
+          <option [value]="p">{{ p }}</option>
+        }
+      </select>
     </div>
-  </div>
-
-  <div>
-    <label for="priority">Priority</label><br>
-    <select id="priority" formControlName="priority">
-      <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
-    </select>
-  </div>
-
-  <div *ngIf="isEdit">
-    <label for="status">Status</label><br>
-    <select id="status" formControlName="status">
-      <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-    </select>
-  </div>
-
-  <p *ngIf="errorMessage()">{{ errorMessage() }}</p>
-
-  <button type="submit" [disabled]="saving()">
-    {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Create ticket') }}
-  </button>
-  <a [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
-</form>
+    @if (isEdit) {
+      <div>
+        <label for="status">Status</label><br />
+        <select id="status" formControlName="status">
+          @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+    }
+    @if (errorMessage()) {
+      <p>{{ errorMessage() }}</p>
+    }
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? 'Saving...' : isEdit ? 'Save changes' : 'Create ticket' }}
+    </button>
+    <a [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
+  </form>
+}

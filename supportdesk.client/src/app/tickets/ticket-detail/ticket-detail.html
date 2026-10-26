@@ -1,12 +1,16 @@
 <p><a routerLink="/tickets">← Back to tickets</a></p>
 
-<p *ngIf="notFound()">Ticket not found.</p>
+@if (notFound()) {
+  <p>Ticket not found.</p>
+}
 
-<div *ngIf="ticketDetail() as t">
-  <p><a [routerLink]="['/tickets', t.id, 'edit']">Edit</a></p>
-  <h2>{{ t.ticketNumber }}: {{ t.subject }}</h2>
-  <p><strong>Description:</strong> {{ t.description }}</p>
-  <p><strong>Status:</strong> {{ t.status }}</p>
-  <p><strong>Priority:</strong> {{ t.priority }}</p>
-  <p><strong>Created:</strong> {{ t.createdAt | date:'dd-MMM-yyyy HH:mm' }}</p>
-</div>  
+@if (ticketDetail(); as t) {
+  <div>
+    <p><a [routerLink]="['/tickets', t.id, 'edit']">Edit</a></p>
+    <h2>{{ t.ticketNumber }}: {{ t.subject }}</h2>
+    <p><strong>Description:</strong> {{ t.description }}</p>
+    <p><strong>Status:</strong> {{ t.status }}</p>
+    <p><strong>Priority:</strong> {{ t.priority }}</p>
+    <p><strong>Created:</strong> {{ t.createdAt | date: 'dd-MMM-yyyy HH:mm' }}</p>
+  </div>
+}

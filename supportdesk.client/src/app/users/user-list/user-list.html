@@ -2,28 +2,36 @@
 
 <p><a routerLink="/users/new">+ New user</a></p>
 
-<p *ngIf="errorMessage()">{{ errorMessage() }}</p>
-<p *ngIf="!users() && !errorMessage()"><em>Loading...</em></p>
+@if (errorMessage()) {
+  <p>{{ errorMessage() }}</p>
+}
+@if (!users() && !errorMessage()) {
+  <p><em>Loading...</em></p>
+}
 
-<table *ngIf="users() as list">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Role</th>
-      <th>Status</th>
-      <th>Created</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let user of list">
-      <td>{{ user.firstName }} {{ user.lastName }}</td>
-      <td>{{ user.email }}</td>
-      <td>{{ user.role }}</td>
-      <td>{{ user.isActive ? 'Active' : 'Inactive' }}</td>
-      <td>{{ user.createdAt | date:'dd-MMM-yyyy' }}</td>
-      <td><a [routerLink]="['/users', user.id, 'edit']">Edit</a></td>
-    </tr>
-  </tbody>
-</table>
+@if (users(); as list) {
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (user of list; track user.id) {
+        <tr>
+          <td>{{ user.firstName }} {{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.isActive ? 'Active' : 'Inactive' }}</td>
+          <td>{{ user.createdAt | date: 'dd-MMM-yyyy' }}</td>
+          <td><a [routerLink]="['/users', user.id, 'edit']">Edit</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

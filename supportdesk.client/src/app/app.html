@@ -1,17 +1,18 @@
 ﻿<header>
-    <h1>SupportDesk</h1>
-    <nav>
-        <ng-container *ngIf="auth.currentUser() as user; else loggedOut">
-            <a routerLink="/tickets">Tickets</a>
-            <a *ngIf="auth.isAdmin()" routerLink="/users">Users</a>
-            |
-            {{ user.fullName }} ({{ user.role }})
-            <button type="button" (click)="logout()">Log out</button>
-        </ng-container>
-        <ng-template #loggedOut>
-            <a routerLink="/login">Log in</a>
-        </ng-template>
-    </nav>
+  <h1>SupportDesk</h1>
+  <nav>
+    @if (auth.currentUser(); as user) {
+      <a routerLink="/tickets">Tickets</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/users">Users</a>
+      }
+      |
+      {{ user.fullName }} ({{ user.role }})
+      <button type="button" (click)="logout()">Log out</button>
+    } @else {
+      <a routerLink="/login">Log in</a>
+    }
+  </nav>
 </header>
 
 <router-outlet></router-outlet>

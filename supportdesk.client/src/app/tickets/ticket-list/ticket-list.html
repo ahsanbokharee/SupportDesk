@@ -1,57 +1,77 @@
 <p><a routerLink="/tickets/new">+ New ticket</a></p>
 
 <form [formGroup]="filters">
-    <input formControlName="search" placeholder="Search subject or number">
+  <input formControlName="search" placeholder="Search subject or number" />
 
-    <select formControlName="status">
-        <option value="">All statuses</option>
-        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-    </select>
+  <select formControlName="status">
+    <option value="">All statuses</option>
+    @for (s of statuses; track s) {
+      <option [value]="s">{{ s }}</option>
+    }
+  </select>
 
-    <select formControlName="priority">
-        <option value="">All priorities</option>
-        <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
-    </select>
+  <select formControlName="priority">
+    <option value="">All priorities</option>
+    @for (p of priorities; track p) {
+      <option [value]="p">{{ p }}</option>
+    }
+  </select>
 
-    <button type="button" (click)="clearFilters()">Clear</button>
+  <button type="button" (click)="clearFilters()">Clear</button>
 </form>
 
-<p *ngIf="errorMessage()">{{ errorMessage() }}</p>
-<p *ngIf="loading() && !result()"><em>Loading...</em></p>
+@if (errorMessage()) {
+  <p>{{ errorMessage() }}</p>
+}
+@if (loading() && !result()) {
+  <p><em>Loading...</em></p>
+}
 
-<ng-container *ngIf="result() as r">
-    <p *ngIf="r.totalCount === 0">No tickets match these filters.</p>
-
-    <table *ngIf="r.totalCount > 0">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Ticket Number</th>
-                <th (click)="sort('subject')" class="sortable">Subject{{ sortIndicator('subject') }}</th>
-                <th (click)="sort('status')" class="sortable">Status{{ sortIndicator('status') }}</th>
-                <th (click)="sort('priority')" class="sortable">Priority{{ sortIndicator('priority') }}</th>
-                <th (click)="sort('createdAt')" class="sortable">Created At{{ sortIndicator('createdAt') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let ticket of r.items">
-                <td>{{ ticket.id }}</td>
-                <td><a [routerLink]="['/tickets', ticket.id]">{{ ticket.ticketNumber }}</a></td>
-                <td>{{ ticket.subject }}</td>
-                <td>{{ ticket.status }}</td>
-                <td>{{ ticket.priority }}</td>
-                <td>{{ ticket.createdAt | date:'dd-MMM-yyyy HH:mm' }}</td>
-            </tr>
-        </tbody>
+@if (result(); as r) {
+  @if (r.totalCount === 0) {
+    <p>No tickets match these filters.</p>
+  }
+  @if (r.totalCount > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Ticket Number</th>
+          <th (click)="sort('subject')" class="sortable">Subject{{ sortIndicator('subject') }}</th>
+          <th (click)="sort('status')" class="sortable">Status{{ sortIndicator('status') }}</th>
+          <th (click)="sort('priority')" class="sortable">
+            Priority{{ sortIndicator('priority') }}
+          </th>
+          <th (click)="sort('createdAt')" class="sortable">
+            Created At{{ sortIndicator('createdAt') }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ticket of r.items; track ticket.id) {
+          <tr>
+            <td>{{ ticket.id }}</td>
+            <td>
+              <a [routerLink]="['/tickets', ticket.id]">{{ ticket.ticketNumber }}</a>
+            </td>
+            <td>{{ ticket.subject }}</td>
+            <td>{{ ticket.status }}</td>
+            <td>{{ ticket.priority }}</td>
+            <td>{{ ticket.createdAt | date: 'dd-MMM-yyyy HH:mm' }}</td>
+          </tr>
+        }
+      </tbody>
     </table>
-
-    <div *ngIf="r.totalPages > 1">
-        <button type="button" [disabled]="r.page <= 1" (click)="goToPage(r.page - 1)">
-            Previous
-        </button>
-        Page {{ r.page }} of {{ r.totalPages }} ({{ r.totalCount }} tickets)
-        <button type="button" [disabled]="r.page >= r.totalPages" (click)="goToPage(r.page + 1)">
-            Next
-        </button>
+  }
+  @if (r.totalPages > 1) {
+    <div>
+      <button type="button" [disabled]="r.page <= 1" (click)="goToPage(r.page - 1)">
+        Previous
+      </button>
+      Page {{ r.page }} of {{ r.totalPages }} ({{ r.totalCount }} tickets)
+      <button type="button" [disabled]="r.page >= r.totalPages" (click)="goToPage(r.page + 1)">
+        Next
+      </button>
     </div>
-</ng-container>
+  }
+}
