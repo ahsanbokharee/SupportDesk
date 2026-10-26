@@ -11,10 +11,11 @@ import { Login } from './auth/login/login';
 import { authInterceptor } from './services/auth-interceptor';
 import { UserList } from './users/user-list/user-list';
 import { UserForm } from './users/user-form/user-form';
+import { MaterialModule } from './material-module';
 
 @NgModule({
   declarations: [App, TicketList, TicketDetail, TicketForm, Login, UserList, UserForm],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, MaterialModule],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([authInterceptor])),
