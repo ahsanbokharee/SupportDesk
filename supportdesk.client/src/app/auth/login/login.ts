@@ -17,6 +17,7 @@ export class Login {
 
   submitting = signal(false);
   errorMessage = signal<string | null>(null);
+  hidePassword = signal(true);
 
   form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
