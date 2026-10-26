@@ -1,18 +1,41 @@
-﻿<header>
-  <h1>SupportDesk</h1>
-  <nav>
-    @if (auth.currentUser(); as user) {
-      <a routerLink="/tickets">Tickets</a>
-      @if (auth.isAdmin()) {
-        <a routerLink="/users">Users</a>
-      }
-      |
-      {{ user.fullName }} ({{ user.role }})
-      <button type="button" (click)="logout()">Log out</button>
-    } @else {
-      <a routerLink="/login">Log in</a>
-    }
-  </nav>
-</header>
+﻿<mat-toolbar class="app-toolbar">
+  <a routerLink="/tickets" class="brand">
+    <mat-icon>support_agent</mat-icon>
+    <span>SupportDesk</span>
+  </a>
 
-<router-outlet></router-outlet>
+  @if (auth.currentUser(); as user) {
+    <nav class="nav">
+      <a mat-button routerLink="/tickets" routerLinkActive="active">Tickets</a>
+      @if (auth.isAdmin()) {
+        <a mat-button routerLink="/users" routerLinkActive="active">Users</a>
+      }
+    </nav>
+
+    <span class="spacer"></span>
+
+    <button mat-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
+      {{ user.fullName }}
+      <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    </button>
+
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="menu-header" (click)="$event.stopPropagation()">
+        <strong>{{ user.fullName }}</strong>
+        <small>{{ user.role }}</small>
+      </div>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Log out</span>
+      </button>
+    </mat-menu>
+  } @else {
+    <span class="spacer"></span>
+    <a mat-button routerLink="/login">Log in</a>
+  }
+</mat-toolbar>
+
+<main class="content">
+  <router-outlet />
+</main>

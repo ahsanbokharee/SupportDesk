@@ -1,14 +1,48 @@
-﻿:host {
-    max-width: 1280px;
-    padding: 2rem;
-    text-align: center;
+﻿.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+  background: var(--mat-sys-primary, #005cbb);
+  color: var(--mat-sys-on-primary, #fff);
 }
 
-th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
 }
 
-table {
-    margin: 0 auto;
+/* Material buttons default to the primary colour, which is invisible on a primary bar */
+.app-toolbar .mat-mdc-button {
+  color: inherit;
+}
+
+.nav .active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.menu-header {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 12px;
+  cursor: default;
+}
+
+.menu-header small {
+  opacity: 0.7;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
 }
