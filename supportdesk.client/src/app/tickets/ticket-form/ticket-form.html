@@ -1,52 +1,73 @@
-<h2>{{ isEdit ? 'Edit ticket' : 'New ticket' }}</h2>
+<div class="page-header">
+  <a mat-icon-button [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']" aria-label="Back">
+    <mat-icon>arrow_back</mat-icon>
+  </a>
+  <h1>{{ isEdit ? 'Edit ticket' : 'New ticket' }}</h1>
+</div>
 
 @if (loading()) {
-  <p>Loading...</p>
-}
-
-@if (!loading()) {
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <div>
-      <label for="subject">Subject</label><br />
-      <input id="subject" formControlName="subject" />
-      @if (form.controls.subject.touched && form.controls.subject.errors?.['required']) {
-        <div>Subject is required.</div>
-      }
-      @if (form.controls.subject.errors?.['maxlength']) {
-        <div>Subject must be 200 characters or fewer.</div>
-      }
-    </div>
-    <div>
-      <label for="description">Description</label><br />
-      <textarea id="description" formControlName="description" rows="5"></textarea>
-      @if (form.controls.description.touched && form.controls.description.errors?.['required']) {
-        <div>Description is required.</div>
-      }
-    </div>
-    <div>
-      <label for="priority">Priority</label><br />
-      <select id="priority" formControlName="priority">
-        @for (p of priorities; track p) {
-          <option [value]="p">{{ p }}</option>
-        }
-      </select>
-    </div>
-    @if (isEdit) {
-      <div>
-        <label for="status">Status</label><br />
-        <select id="status" formControlName="status">
-          @for (s of statuses; track s) {
-            <option [value]="s">{{ s }}</option>
+  <div class="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="40" />
+  </div>
+} @else {
+  <mat-card appearance="outlined" class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" id="ticketForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Subject</mat-label>
+          <input matInput formControlName="subject" maxlength="200" />
+          <mat-hint align="end">{{ form.controls.subject.value.length }} / 200</mat-hint>
+          @if (form.controls.subject.hasError('required')) {
+            <mat-error>Subject is required.</mat-error>
           }
-        </select>
-      </div>
-    }
-    @if (errorMessage()) {
-      <p>{{ errorMessage() }}</p>
-    }
-    <button type="submit" [disabled]="saving()">
-      {{ saving() ? 'Saving...' : isEdit ? 'Save changes' : 'Create ticket' }}
-    </button>
-    <a [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
-  </form>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="6"></textarea>
+          @if (form.controls.description.hasError('required')) {
+            <mat-error>Description is required.</mat-error>
+          } @else if (form.controls.description.hasError('maxlength')) {
+            <mat-error>Description must be 4000 characters or fewer.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="row">
+          <mat-form-field appearance="outline">
+            <mat-label>Priority</mat-label>
+            <mat-select formControlName="priority">
+              @for (p of priorities; track p) {
+                <mat-option [value]="p">{{ p }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (isEdit) {
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                @for (s of statuses; track s) {
+                  <mat-option [value]="s">{{ s }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-banner" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <a mat-button [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
+      <button mat-flat-button type="submit" form="ticketForm" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : isEdit ? 'Save changes' : 'Create ticket' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
 }
