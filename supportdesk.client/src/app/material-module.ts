@@ -18,6 +18,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 const materialModules = [
   MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule,
@@ -25,6 +26,7 @@ const materialModules = [
   MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule,
   MatCardModule, MatChipsModule, MatSnackBarModule, MatProgressSpinnerModule,
   MatButtonToggleModule, TextFieldModule, MatSlideToggleModule, MatTooltipModule,
+  ClipboardModule,
 ];
 
 @NgModule({
