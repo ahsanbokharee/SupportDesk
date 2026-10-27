@@ -46,6 +46,7 @@ export interface TicketQuery {
 @Service()
 export class TicketService {
   private http = inject(HttpClient);
+  private baseUrl = '/api/tickets';
 
   getTickets(query: TicketQuery = {}): Observable<PagedResult<Ticket>> {
     let params = new HttpParams();
@@ -55,17 +56,16 @@ export class TicketService {
         params = params.set(key, value);
       }
     }
-
-    return this.http.get<PagedResult<Ticket>>('/api/tickets', { params });
+    return this.http.get<PagedResult<Ticket>>(this.baseUrl, { params });
   }
   getTicket(id: number): Observable<Ticket> {
-    return this.http.get<Ticket>(`/api/tickets/${id}`);
+    return this.http.get<Ticket>(`${this.baseUrl}/${id}`);
   }
   createTicket(ticket: CreateTicket): Observable<Ticket> {
-    return this.http.post<Ticket>('/api/tickets', ticket);
+    return this.http.post<Ticket>(this.baseUrl, ticket);
   }
   updateTicket(id: number, ticket: UpdateTicket): Observable<Ticket> {
-    return this.http.put<Ticket>(`/api/tickets/${id}`, ticket);
+    return this.http.put<Ticket>(`${this.baseUrl}/${id}`, ticket);
   }
 
 }

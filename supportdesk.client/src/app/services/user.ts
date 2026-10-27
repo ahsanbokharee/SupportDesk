@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, injectAsync, Service } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface User {
@@ -29,7 +29,7 @@ export interface UpdateUser {
 @Service()
 export class UserService {
     private http = inject(HttpClient);
-    private baseUrl = 'api/users';
+    private baseUrl = '/api/users';
 
     getUsers(): Observable<User[]> {
         return this.http.get<User[]>(this.baseUrl);
