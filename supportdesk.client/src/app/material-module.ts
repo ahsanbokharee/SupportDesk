@@ -16,13 +16,15 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { TextFieldModule } from '@angular/cdk/text-field';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const materialModules = [
   MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule,
   MatTableModule, MatPaginatorModule, MatSortModule,
   MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule,
   MatCardModule, MatChipsModule, MatSnackBarModule, MatProgressSpinnerModule,
-  MatButtonToggleModule, TextFieldModule,
+  MatButtonToggleModule, TextFieldModule, MatSlideToggleModule, MatTooltipModule,
 ];
 
 @NgModule({
