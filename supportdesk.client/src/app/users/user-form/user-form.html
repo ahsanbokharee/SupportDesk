@@ -1,71 +1,146 @@
-<h2>{{ isEdit ? 'Edit user' : 'New user' }}</h2>
+<div class="page-header">
+  <a mat-icon-button routerLink="/users" aria-label="Back to users">
+    <mat-icon>arrow_back</mat-icon>
+  </a>
+  <h1>{{ isEdit ? 'Edit user' : 'New user' }}</h1>
+</div>
 
 @if (loading()) {
-  <p>Loading...</p>
-}
+  <div class="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="40" />
+  </div>
+} @else {
+  <div class="layout">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>{{ isEdit ? 'Account details' : 'Create an account' }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ isEdit ? 'Update the details, role or access.' : 'The user can log in straight away with this password.' }}
+        </mat-card-subtitle>
+      </mat-card-header>
 
-@if (!loading()) {
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <div>
-      <label for="firstName">First name</label><br />
-      <input id="firstName" formControlName="firstName" />
-      @if (form.controls.firstName.touched && form.controls.firstName.errors?.['required']) {
-        <div>First name is required.</div>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()" id="userForm">
+          <div class="row">
+            <mat-form-field appearance="outline">
+              <mat-label>First name</mat-label>
+              <input matInput formControlName="firstName" />
+              @if (form.controls.firstName.hasError('required')) {
+                <mat-error>First name is required.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Last name</mat-label>
+              <input matInput formControlName="lastName" />
+              @if (form.controls.lastName.hasError('required')) {
+                <mat-error>Last name is required.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <mat-icon matPrefix>mail</mat-icon>
+            <input matInput type="email" formControlName="email" autocomplete="off" />
+            @if (form.controls.email.hasError('required')) {
+              <mat-error>Email is required.</mat-error>
+            } @else if (form.controls.email.hasError('email')) {
+              <mat-error>Enter a valid email address.</mat-error>
+            }
+          </mat-form-field>
+
+          @if (!isEdit) {
+            <mat-form-field appearance="outline">
+              <mat-label>Initial password</mat-label>
+              <mat-icon matPrefix>lock</mat-icon>
+              <input matInput [type]="hidePassword() ? 'password' : 'text'"
+                     formControlName="password" autocomplete="new-password" />
+              <button mat-icon-button matSuffix type="button"
+                      (click)="hidePassword.set(!hidePassword())"
+                      [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+                <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+              </button>
+              <mat-hint>At least 8 characters.</mat-hint>
+              @if (form.controls.password.hasError('required')) {
+                <mat-error>Password is required.</mat-error>
+              } @else if (form.controls.password.hasError('minlength')) {
+                <mat-error>Password must be at least 8 characters.</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          <div class="field">
+            <span class="field-label">Role</span>
+            <mat-button-toggle-group formControlName="role">
+              <mat-button-toggle value="Customer"><mat-icon>person</mat-icon> Customer</mat-button-toggle>
+              <mat-button-toggle value="Agent"><mat-icon>support_agent</mat-icon> Agent</mat-button-toggle>
+              <mat-button-toggle value="Admin"><mat-icon>admin_panel_settings</mat-icon> Admin</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          @if (isEdit) {
+            <mat-slide-toggle formControlName="isActive">
+              {{ form.controls.isActive.value ? 'Active: can log in' : 'Inactive: login blocked' }}
+            </mat-slide-toggle>
+          }
+
+          @if (errorMessage()) {
+            <div class="error-banner" role="alert">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage() }}</span>
+            </div>
+          }
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <a mat-button routerLink="/users">Cancel</a>
+        <button mat-flat-button type="submit" form="userForm" [disabled]="saving()">
+          <mat-icon>{{ isEdit ? 'save' : 'person_add' }}</mat-icon>
+          {{ saving() ? 'Saving…' : isEdit ? 'Save changes' : 'Create user' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <aside>
+      @if (isEdit && user(); as u) {
+        <mat-card appearance="outlined" class="side">
+          <mat-card-header>
+            <mat-card-title>Account</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <dl class="facts">
+              <dt>Created</dt>
+              <dd>{{ u.createdAt | date: 'dd MMM yyyy' }}</dd>
+              <dt>Current role</dt>
+              <dd><span class="badge" [attr.data-value]="u.role">{{ u.role }}</span></dd>
+              <dt>Status</dt>
+              <dd>
+                <span class="badge" [attr.data-value]="u.isActive ? 'Active' : 'Inactive'">
+                  {{ u.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </dd>
+            </dl>
+          </mat-card-content>
+        </mat-card>
       }
-    </div>
-    <div>
-      <label for="lastName">Last name</label><br />
-      <input id="lastName" formControlName="lastName" />
-      @if (form.controls.lastName.touched && form.controls.lastName.errors?.['required']) {
-        <div>Last name is required.</div>
-      }
-    </div>
-    <div>
-      <label for="email">Email</label><br />
-      <input id="email" type="email" formControlName="email" />
-      @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
-        <div>Email is required.</div>
-      }
-      @if (form.controls.email.touched && form.controls.email.errors?.['email']) {
-        <div>Enter a valid email address.</div>
-      }
-    </div>
-    @if (!isEdit) {
-      <div>
-        <label for="password">Initial password</label><br />
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          autocomplete="new-password"
-        />
-        @if (form.controls.password.touched && form.controls.password.errors?.['required']) {
-          <div>Password is required.</div>
-        }
-        @if (form.controls.password.touched && form.controls.password.errors?.['minlength']) {
-          <div>Password must be at least 8 characters.</div>
-        }
-      </div>
-    }
-    <div>
-      <label for="role">Role</label><br />
-      <select id="role" formControlName="role">
-        @for (r of roles; track r) {
-          <option [value]="r">{{ r }}</option>
-        }
-      </select>
-    </div>
-    @if (isEdit) {
-      <div>
-        <label> <input type="checkbox" formControlName="isActive" /> Active </label>
-      </div>
-    }
-    @if (errorMessage()) {
-      <p>{{ errorMessage() }}</p>
-    }
-    <button type="submit" [disabled]="saving()">
-      {{ saving() ? 'Saving...' : isEdit ? 'Save changes' : 'Create user' }}
-    </button>
-    <a routerLink="/users">Cancel</a>
-  </form>
+
+      <mat-card appearance="outlined" class="side">
+        <mat-card-header>
+          <mat-card-title>What each role can do</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <dl class="roles">
+            <dt><mat-icon>person</mat-icon> Customer</dt>
+            <dd>Raises tickets and follows their own.</dd>
+            <dt><mat-icon>support_agent</mat-icon> Agent</dt>
+            <dd>Works on tickets: triage, status, replies.</dd>
+            <dt><mat-icon>admin_panel_settings</mat-icon> Admin</dt>
+            <dd>Everything agents can do, plus managing users.</dd>
+          </dl>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+  </div>
 }

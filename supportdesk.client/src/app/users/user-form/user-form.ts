@@ -24,6 +24,8 @@ export class UserForm implements OnInit {
   loading = signal(false);
   saving = signal(false);
   errorMessage = signal<string | null>(null);
+  hidePassword = signal(true);
+  user = signal<User | null>(null);
 
   form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -42,6 +44,7 @@ export class UserForm implements OnInit {
     this.loading.set(true);
     this.userService.getUser(this.userId).subscribe({
       next: user => {
+        this.user.set(user);
         this.form.patchValue(user);
         this.loading.set(false);
       },
