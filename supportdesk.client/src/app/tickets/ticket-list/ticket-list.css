@@ -72,52 +72,6 @@ table {
   color: var(--mat-sys-primary, #005cbb);
 }
 
-.badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* status */
-.badge[data-value="Open"] {
-  background: #e3f2fd;
-  color: #0d47a1;
-}
-
-.badge[data-value="In Progress"] {
-  background: #fff3e0;
-  color: #e65100;
-}
-
-.badge[data-value="Resolved"] {
-  background: #e8f5e9;
-  color: #1b5e20;
-}
-
-.badge[data-value="Closed"] {
-  background: #eceff1;
-  color: #455a64;
-}
-
-/* priority */
-.badge[data-value="High"] {
-  background: #ffebee;
-  color: #b71c1c;
-}
-
-.badge[data-value="Medium"] {
-  background: #fff8e1;
-  color: #8d6e00;
-}
-
-.badge[data-value="Low"] {
-  background: #f1f8e9;
-  color: #33691e;
-}
-
 .empty {
   padding: 32px;
   text-align: center;

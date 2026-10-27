@@ -8,7 +8,7 @@ import { Ticket, TicketService } from '../../services/ticket';
   styleUrl: './ticket-detail.css',
   templateUrl: './ticket-detail.html',
 })
-export class TicketDetail {
+export class TicketDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private ticketService = inject(TicketService);
 

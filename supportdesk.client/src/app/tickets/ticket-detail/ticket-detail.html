@@ -1,16 +1,55 @@
-<p><a routerLink="/tickets">← Back to tickets</a></p>
+<div class="page-header">
+  <a mat-icon-button routerLink="/tickets" aria-label="Back to tickets">
+    <mat-icon>arrow_back</mat-icon>
+  </a>
+
+  @if (ticketDetail(); as t) {
+    <div class="title">
+      <span class="ticket-number">{{ t.ticketNumber }}</span>
+      <h1>{{ t.subject }}</h1>
+    </div>
+    <a mat-stroked-button [routerLink]="['/tickets', t.id, 'edit']">
+      <mat-icon>edit</mat-icon>
+      Edit
+    </a>
+  }
+</div>
 
 @if (notFound()) {
-  <p>Ticket not found.</p>
+  <mat-card appearance="outlined" class="not-found">
+    <mat-icon>search_off</mat-icon>
+    <p>Ticket not found.</p>
+    <a mat-button routerLink="/tickets">Back to tickets</a>
+  </mat-card>
 }
 
 @if (ticketDetail(); as t) {
-  <div>
-    <p><a [routerLink]="['/tickets', t.id, 'edit']">Edit</a></p>
-    <h2>{{ t.ticketNumber }}: {{ t.subject }}</h2>
-    <p><strong>Description:</strong> {{ t.description }}</p>
-    <p><strong>Status:</strong> {{ t.status }}</p>
-    <p><strong>Priority:</strong> {{ t.priority }}</p>
-    <p><strong>Created:</strong> {{ t.createdAt | date: 'dd-MMM-yyyy HH:mm' }}</p>
+  <div class="layout">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Description</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="description">{{ t.description }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <dl class="details">
+          <dt>Status</dt>
+          <dd><span class="badge" [attr.data-value]="t.status">{{ t.status }}</span></dd>
+
+          <dt>Priority</dt>
+          <dd><span class="badge" [attr.data-value]="t.priority">{{ t.priority }}</span></dd>
+
+          <dt>Created</dt>
+          <dd>{{ t.createdAt | date: 'dd MMM yyyy, HH:mm' }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
   </div>
 }
