@@ -10,23 +10,10 @@
   font: var(--mat-sys-headline-small);
 }
 
-.form-card {
-  max-width: 760px;
-}
-
 form {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.row {
-  display: flex;
-  gap: 16px;
-}
-
-.row mat-form-field {
-  flex: 1;
 }
 
 .error-banner {
@@ -48,4 +35,75 @@ mat-card-actions {
   display: flex;
   justify-content: center;
   padding: 48px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 16px;
+  align-items: start;
+  max-width: 1100px;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+mat-card-header {
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+
+.field-label {
+  font: var(--mat-sys-label-large);
+  opacity: 0.8;
+}
+
+.toggles {
+  flex-wrap: wrap;
+}
+
+.toggles mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* selected priority takes the same colours as the badges */
+.p-low.mat-button-toggle-checked    { background: #f1f8e9; color: #33691e; }
+.p-medium.mat-button-toggle-checked { background: #fff8e1; color: #8d6e00; }
+.p-high.mat-button-toggle-checked   { background: #ffebee; color: #b71c1c; }
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 16px;
+  margin: 0;
+}
+
+.facts dt { opacity: 0.7; }
+.facts dd { margin: 0; }
+
+.mono {
+  font-family: 'Roboto Mono', monospace;
+}
+
+.tips mat-icon[mat-card-avatar] {
+  color: #f9a825;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
 }

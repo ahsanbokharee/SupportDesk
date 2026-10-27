@@ -14,12 +14,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { TextFieldModule } from '@angular/cdk/text-field';
 
 const materialModules = [
   MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule,
   MatTableModule, MatPaginatorModule, MatSortModule,
   MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule,
   MatCardModule, MatChipsModule, MatSnackBarModule, MatProgressSpinnerModule,
+  MatButtonToggleModule, TextFieldModule,
 ];
 
 @NgModule({

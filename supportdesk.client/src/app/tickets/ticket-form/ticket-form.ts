@@ -26,6 +26,7 @@ export class TicketForm implements OnInit {
   loading = signal(false);
   saving = signal(false);
   errorMessage = signal<string | null>(null);
+  ticket = signal<Ticket | null>(null);
 
   form = this.fb.nonNullable.group({
     subject: ['', [Validators.required, Validators.maxLength(200)]],
@@ -42,6 +43,7 @@ export class TicketForm implements OnInit {
     this.loading.set(true);
     this.ticketService.getTicket(this.ticketId).subscribe({
       next: ticket => {
+        this.ticket.set(ticket);
         this.form.patchValue(ticket);
         this.loading.set(false);
       },

@@ -10,64 +10,115 @@
     <mat-progress-spinner mode="indeterminate" diameter="40" />
   </div>
 } @else {
-  <mat-card appearance="outlined" class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit()" id="ticketForm">
-        <mat-form-field appearance="outline">
-          <mat-label>Subject</mat-label>
-          <input matInput formControlName="subject" maxlength="200" />
-          <mat-hint align="end">{{ form.controls.subject.value.length }} / 200</mat-hint>
-          @if (form.controls.subject.hasError('required')) {
-            <mat-error>Subject is required.</mat-error>
-          }
-        </mat-form-field>
+  <div class="layout">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>{{ isEdit ? 'Update the ticket' : 'Describe the problem' }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ isEdit ? 'Change the details, priority or status.' : 'A clear subject and steps help us solve it faster.' }}
+        </mat-card-subtitle>
+      </mat-card-header>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Description</mat-label>
-          <textarea matInput formControlName="description" rows="6"></textarea>
-          @if (form.controls.description.hasError('required')) {
-            <mat-error>Description is required.</mat-error>
-          } @else if (form.controls.description.hasError('maxlength')) {
-            <mat-error>Description must be 4000 characters or fewer.</mat-error>
-          }
-        </mat-form-field>
-
-        <div class="row">
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()" id="ticketForm">
           <mat-form-field appearance="outline">
-            <mat-label>Priority</mat-label>
-            <mat-select formControlName="priority">
-              @for (p of priorities; track p) {
-                <mat-option [value]="p">{{ p }}</mat-option>
-              }
-            </mat-select>
+            <mat-label>Subject</mat-label>
+            <input matInput formControlName="subject" maxlength="200"
+                   placeholder="e.g. Can't reset my password" />
+            <mat-hint align="end">{{ form.controls.subject.value.length }} / 200</mat-hint>
+            @if (form.controls.subject.hasError('required')) {
+              <mat-error>Subject is required.</mat-error>
+            }
           </mat-form-field>
 
-          @if (isEdit) {
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select formControlName="status">
-                @for (s of statuses; track s) {
-                  <mat-option [value]="s">{{ s }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-          }
-        </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" maxlength="4000"
+                      cdkTextareaAutosize cdkAutosizeMinRows="6" cdkAutosizeMaxRows="16"
+                      placeholder="What happened? What did you expect? Steps to reproduce?"></textarea>
+            <mat-hint align="end">{{ form.controls.description.value.length }} / 4000</mat-hint>
+            @if (form.controls.description.hasError('required')) {
+              <mat-error>Description is required.</mat-error>
+            }
+          </mat-form-field>
 
-        @if (errorMessage()) {
-          <div class="error-banner" role="alert">
-            <mat-icon>error_outline</mat-icon>
-            <span>{{ errorMessage() }}</span>
+          <div class="field">
+            <span class="field-label">Priority</span>
+            <mat-button-toggle-group formControlName="priority" class="toggles">
+              <mat-button-toggle value="Low" class="p-low">
+                <mat-icon>arrow_downward</mat-icon> Low
+              </mat-button-toggle>
+              <mat-button-toggle value="Medium" class="p-medium">
+                <mat-icon>remove</mat-icon> Medium
+              </mat-button-toggle>
+              <mat-button-toggle value="High" class="p-high">
+                <mat-icon>priority_high</mat-icon> High
+              </mat-button-toggle>
+            </mat-button-toggle-group>
           </div>
-        }
-      </form>
-    </mat-card-content>
 
-    <mat-card-actions align="end">
-      <a mat-button [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
-      <button mat-flat-button type="submit" form="ticketForm" [disabled]="saving()">
-        {{ saving() ? 'Saving…' : isEdit ? 'Save changes' : 'Create ticket' }}
-      </button>
-    </mat-card-actions>
-  </mat-card>
+          @if (isEdit) {
+            <div class="field">
+              <span class="field-label">Status</span>
+              <mat-button-toggle-group formControlName="status" class="toggles">
+                @for (s of statuses; track s) {
+                  <mat-button-toggle [value]="s">{{ s }}</mat-button-toggle>
+                }
+              </mat-button-toggle-group>
+            </div>
+          }
+
+          @if (errorMessage()) {
+            <div class="error-banner" role="alert">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage() }}</span>
+            </div>
+          }
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <a mat-button [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']">Cancel</a>
+        <button mat-flat-button type="submit" form="ticketForm" [disabled]="saving()">
+          <mat-icon>{{ isEdit ? 'save' : 'send' }}</mat-icon>
+          {{ saving() ? 'Saving…' : isEdit ? 'Save changes' : 'Create ticket' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <aside>
+      @if (isEdit && ticket(); as t) {
+        <mat-card appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>Ticket</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <dl class="facts">
+              <dt>Number</dt>
+              <dd class="mono">{{ t.ticketNumber }}</dd>
+              <dt>Created</dt>
+              <dd>{{ t.createdAt | date: 'dd MMM yyyy, HH:mm' }}</dd>
+              <dt>Current status</dt>
+              <dd><span class="badge" [attr.data-value]="t.status">{{ t.status }}</span></dd>
+            </dl>
+          </mat-card-content>
+        </mat-card>
+      } @else {
+        <mat-card appearance="outlined" class="tips">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>lightbulb</mat-icon>
+            <mat-card-title>Tips for a good ticket</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ul>
+              <li>One problem per ticket.</li>
+              <li>Say what you expected and what happened instead.</li>
+              <li>List the steps to reproduce it.</li>
+              <li>Use <strong>High</strong> only when work is blocked.</li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+      }
+    </aside>
+  </div>
 }
