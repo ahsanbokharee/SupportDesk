@@ -10,7 +10,7 @@ public class CreateTicketDto
     [MaxLength(200)]
     public string Subject {get; set;} = "";
     [Required]
-    [MaxLength(200)]
+    [MaxLength(4000)]
     public string Description {get; set;} = "";
     [Required]
     [AllowedValues ("Low", "Medium", "High")]
