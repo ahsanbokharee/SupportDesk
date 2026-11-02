@@ -1,9 +1,15 @@
-<div class="page-header">
-  <a mat-icon-button routerLink="/users" aria-label="Back to users">
-    <mat-icon>arrow_back</mat-icon>
-  </a>
-  <h1>{{ isEdit ? 'Edit user' : 'New user' }}</h1>
-</div>
+<header>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/users">Users</a>
+    <mat-icon>chevron_right</mat-icon>
+    @if (isEdit && user(); as u) {
+      <span>{{ u.firstName }} {{ u.lastName }}</span>
+    } @else {
+      <span>{{ isEdit ? 'Edit user' : 'New user' }}</span>
+    }
+  </nav>
+  <h1 class="page-title">{{ isEdit ? 'Edit user' : 'New user' }}</h1>
+</header>
 
 @if (loading()) {
   <div class="loading">

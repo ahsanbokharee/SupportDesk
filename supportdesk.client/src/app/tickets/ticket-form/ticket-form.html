@@ -1,9 +1,15 @@
-<div class="page-header">
-  <a mat-icon-button [routerLink]="isEdit ? ['/tickets', ticketId] : ['/tickets']" aria-label="Back">
-    <mat-icon>arrow_back</mat-icon>
-  </a>
-  <h1>{{ isEdit ? 'Edit ticket' : 'New ticket' }}</h1>
-</div>
+<header>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/tickets">Tickets</a>
+    @if (isEdit) {
+      <mat-icon>chevron_right</mat-icon>
+      <a class="mono" [routerLink]="['/tickets', ticketId]">{{ ticket()?.ticketNumber ?? '…' }}</a>
+    }
+    <mat-icon>chevron_right</mat-icon>
+    <span>{{ isEdit ? 'Edit' : 'New ticket' }}</span>
+  </nav>
+  <h1 class="page-title">{{ isEdit ? 'Edit ticket' : 'New ticket' }}</h1>
+</header>
 
 @if (loading()) {
   <div class="loading">

@@ -47,3 +47,48 @@ input::-ms-clear {
 .error {
   color: var(--mat-sys-error, #b3261e);
 }
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.breadcrumb a {
+  color: var(--mat-sys-primary, #005cbb);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb > mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+}
+
+.mono {
+  font-family: 'Roboto Mono', monospace;
+}
+
+.breadcrumb .copy {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+}
+
+.breadcrumb .copy mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.page-title {
+  margin: 4px 0 24px;
+  font: var(--mat-sys-headline-medium);
+}
