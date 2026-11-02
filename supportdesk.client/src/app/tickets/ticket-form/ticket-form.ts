@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ticket, TicketService } from '../../services/ticket';
+import { NotificationService } from '../../services/notification';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -15,6 +16,7 @@ export class TicketForm implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private ticketService = inject(TicketService);
+  private notify = inject(NotificationService);
 
   private idParam = this.route.snapshot.paramMap.get('id');
   ticketId = this.idParam ? Number(this.idParam) : null;
@@ -76,7 +78,10 @@ export class TicketForm implements OnInit {
     }
 
     request.subscribe({
-      next: ticket => this.router.navigate(['/tickets', ticket.id]),
+      next: ticket => {
+        this.notify.success(this.isEdit ? 'Ticket saved' : `Ticket ${ticket.ticketNumber} created`);
+        this.router.navigate(['/tickets', ticket.id]);
+      },
       error: err => {
         this.saving.set(false);
         this.errorMessage.set(

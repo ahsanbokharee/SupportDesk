@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User, UserService } from '../../services/user';
 import { Observable } from 'rxjs';
+import { NotificationService } from '../../services/notification';
 
 @Component({
   selector: 'app-user-form',
@@ -15,6 +16,7 @@ export class UserForm implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private userService = inject(UserService);
+  private notify = inject(NotificationService);
 
   private idParam = this.route.snapshot.paramMap.get('id');
   userId = this.idParam ? Number(this.idParam) : null;
@@ -76,7 +78,12 @@ export class UserForm implements OnInit {
     }
 
     request.subscribe({
-      next: () => this.router.navigate(['/users']),
+      next: user => {
+        this.notify.success(
+          this.isEdit ? `${user.firstName} ${user.lastName} saved` : `${user.firstName} ${user.lastName} created`
+        );
+        this.router.navigate(['/users']);
+      },
       error: err => {
         this.saving.set(false);
         this.errorMessage.set(err.error?.message ?? 'Could not save the user. Please check the fields.');

@@ -13,7 +13,9 @@
       <a routerLink="/tickets">Tickets</a>
       <mat-icon>chevron_right</mat-icon>
       <span class="mono">{{ t.ticketNumber }}</span>
-      <button mat-icon-button class="copy" type="button" [cdkCopyToClipboard]="t.ticketNumber"
+      <button mat-icon-button class="copy" type="button" 
+        [cdkCopyToClipboard]="t.ticketNumber" 
+        (cdkCopyToClipboardCopied)="copied($event, t.ticketNumber)"
         matTooltip="Copy ticket number" aria-label="Copy ticket number">
         <mat-icon>content_copy</mat-icon>
       </button>
