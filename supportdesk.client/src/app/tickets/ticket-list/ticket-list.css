@@ -1,4 +1,83 @@
-.sortable {
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filters .search {
+  flex: 1 1 280px;
+}
+
+.table-card {
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+  /* widths come from the CSS below, not from the data */
+}
+
+.mat-column-ticketNumber {
+  width: 120px;
+}
+
+.mat-column-status {
+  width: 140px;
+}
+
+.mat-column-priority {
+  width: 120px;
+}
+
+.mat-column-createdAt {
+  width: 190px;
+}
+
+/* Subject gets the remaining width; long text is cut with … */
+.mat-column-subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clickable-row {
   cursor: pointer;
-  user-select: none;
+}
+
+.clickable-row:hover {
+  background: var(--mat-sys-surface-container-high, #eef1f6);
+}
+
+.ticket-number {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+  color: var(--mat-sys-primary, #005cbb);
+}
+
+.empty {
+  padding: 32px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.error {
+  color: var(--mat-sys-error, #b3261e);
 }

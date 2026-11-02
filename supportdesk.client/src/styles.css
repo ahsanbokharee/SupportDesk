@@ -1,1 +1,111 @@
-/* You can add global styles to this file, and also import other style files */
+/* Hide Edge's built-in password reveal and clear buttons; we provide our own */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+/* ---------- Shared components ---------- */
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* status */
+.badge[data-value="Open"]        { background: #e3f2fd; color: #0d47a1; }
+.badge[data-value="In Progress"] { background: #fff3e0; color: #e65100; }
+.badge[data-value="Resolved"]    { background: #e8f5e9; color: #1b5e20; }
+.badge[data-value="Closed"]      { background: #eceff1; color: #455a64; }
+
+/* priority */
+.badge[data-value="High"]   { background: #ffebee; color: #b71c1c; }
+.badge[data-value="Medium"] { background: #fff8e1; color: #8d6e00; }
+.badge[data-value="Low"]    { background: #f1f8e9; color: #33691e; }
+
+/* role */
+.badge[data-value="Admin"]    { background: #f3e5f5; color: #6a1b9a; }
+.badge[data-value="Agent"]    { background: #e0f2f1; color: #00695c; }
+.badge[data-value="Customer"] { background: #eceff1; color: #455a64; }
+
+/* account status */
+.badge[data-value="Active"]   { background: #e8f5e9; color: #1b5e20; }
+.badge[data-value="Inactive"] { background: #fbe9e7; color: #bf360c; }
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-error-container, #ffdad6);
+  color: var(--mat-sys-on-error-container, #410002);
+}
+
+.error {
+  color: var(--mat-sys-error, #b3261e);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.breadcrumb a {
+  color: var(--mat-sys-primary, #005cbb);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb > mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+}
+
+.mono {
+  font-family: 'Roboto Mono', monospace;
+}
+
+.breadcrumb .copy {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+}
+
+.breadcrumb .copy mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.page-title {
+  margin: 4px 0 24px;
+  font: var(--mat-sys-headline-medium);
+}
+
+/* ---------- Snackbars ---------- */
+.snack-success {
+  --mat-snack-bar-container-color: #1b5e20;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #c8e6c9;
+}
+
+.snack-info {
+  --mat-snack-bar-container-color: #0d47a1;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #bbdefb;
+}
+
+.mat-mdc-snack-bar-container.snack {
+  margin-top: 72px;
+}

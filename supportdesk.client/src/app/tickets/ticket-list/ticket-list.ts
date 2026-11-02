@@ -3,6 +3,8 @@ import { PagedResult, Ticket, TicketService } from '../../services/ticket';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { PageEvent } from '@angular/material/paginator';
+import { Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-ticket-list',
@@ -18,7 +20,8 @@ export class TicketList implements OnInit {
 
   statuses = ['Open', 'In Progress', 'Resolved', 'Closed'];
   priorities = ['Low', 'Medium', 'High'];
-  pageSize = 10;
+  pageSize = signal(10);
+  displayedColumns = ['ticketNumber', 'subject', 'status', 'priority', 'createdAt'];
 
   result = signal<PagedResult<Ticket> | null>(null);
   page = signal(1);
@@ -52,7 +55,7 @@ export class TicketList implements OnInit {
       .getTickets({
         ...this.filters.getRawValue(),
         page: this.page(),
-        pageSize: this.pageSize,
+        pageSize: this.pageSize(),
         sortBy: this.sortBy(),
         sortDir: this.sortDir(),
       })
@@ -69,30 +72,22 @@ export class TicketList implements OnInit {
       });
   }
 
-  goToPage(page: number) {
-    this.page.set(page);
-    this.load();
-  }
-
   clearFilters() {
     this.filters.reset();
   }
-  
-  sort(column: string) {
-    if (this.sortBy() === column) {
-      this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortBy.set(column);
-      this.sortDir.set(column === 'subject' ? 'asc' : 'desc');
-    }
+
+  // mat-sort-header clicked: Material tells us which column and which direction
+  onSort(sort: Sort) {
+    this.sortBy.set(sort.active);
+    this.sortDir.set(sort.direction === 'asc' ? 'asc' : 'desc');
     this.page.set(1);
     this.load();
   }
 
-  sortIndicator(column: string): string {
-    if (this.sortBy() !== column) {
-      return '';
-    }
-    return this.sortDir() === 'asc' ? ' ▲' : ' ▼';
+  // Paginator clicked: Material counts pages from 0, our API counts from 1
+  onPage(event: PageEvent) {
+    this.page.set(event.pageIndex + 1);
+    this.pageSize.set(event.pageSize);
+    this.load();
   }
 }

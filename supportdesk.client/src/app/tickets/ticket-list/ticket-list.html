@@ -1,57 +1,96 @@
-<p><a routerLink="/tickets/new">+ New ticket</a></p>
+<div class="page-header">
+  <h1>
+    Tickets
+    @if (loading()) {
+    <mat-progress-spinner mode="indeterminate" diameter="20" />
+    }
+  </h1>
+  <a mat-flat-button routerLink="/tickets/new">
+    <mat-icon>add</mat-icon>
+    New ticket
+  </a>
+</div>
 
-<form [formGroup]="filters">
-    <input formControlName="search" placeholder="Search subject or number">
+<form [formGroup]="filters" class="filters">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+    <mat-label>Search</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput formControlName="search" placeholder="Subject or ticket number" />
+  </mat-form-field>
 
-    <select formControlName="status">
-        <option value="">All statuses</option>
-        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-    </select>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status">
+      <mat-option value="">All statuses</mat-option>
+      @for (s of statuses; track s) {
+      <mat-option [value]="s">{{ s }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
-    <select formControlName="priority">
-        <option value="">All priorities</option>
-        <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
-    </select>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Priority</mat-label>
+    <mat-select formControlName="priority">
+      <mat-option value="">All priorities</mat-option>
+      @for (p of priorities; track p) {
+      <mat-option [value]="p">{{ p }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
-    <button type="button" (click)="clearFilters()">Clear</button>
+  <button mat-button type="button" (click)="clearFilters()">Clear</button>
 </form>
 
-<p *ngIf="errorMessage()">{{ errorMessage() }}</p>
-<p *ngIf="loading() && !result()"><em>Loading...</em></p>
+@if (errorMessage()) {
+<p class="error">{{ errorMessage() }}</p>
+}
 
-<ng-container *ngIf="result() as r">
-    <p *ngIf="r.totalCount === 0">No tickets match these filters.</p>
+@if (result(); as r) {
+<mat-card appearance="outlined" class="table-card">
+  @if (r.totalCount === 0) {
+  <p class="empty">No tickets match these filters.</p>
+  } @else {
+  <table mat-table [dataSource]="r.items" matSort [matSortActive]="sortBy()" [matSortDirection]="sortDir()"
+    matSortDisableClear (matSortChange)="onSort($event)">
 
-    <table *ngIf="r.totalCount > 0">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Ticket Number</th>
-                <th (click)="sort('subject')" class="sortable">Subject{{ sortIndicator('subject') }}</th>
-                <th (click)="sort('status')" class="sortable">Status{{ sortIndicator('status') }}</th>
-                <th (click)="sort('priority')" class="sortable">Priority{{ sortIndicator('priority') }}</th>
-                <th (click)="sort('createdAt')" class="sortable">Created At{{ sortIndicator('createdAt') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let ticket of r.items">
-                <td>{{ ticket.id }}</td>
-                <td><a [routerLink]="['/tickets', ticket.id]">{{ ticket.ticketNumber }}</a></td>
-                <td>{{ ticket.subject }}</td>
-                <td>{{ ticket.status }}</td>
-                <td>{{ ticket.priority }}</td>
-                <td>{{ ticket.createdAt | date:'dd-MMM-yyyy HH:mm' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <ng-container matColumnDef="ticketNumber">
+      <th mat-header-cell *matHeaderCellDef>Ticket</th>
+      <td mat-cell *matCellDef="let ticket">
+        <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+      </td>
+    </ng-container>
 
-    <div *ngIf="r.totalPages > 1">
-        <button type="button" [disabled]="r.page <= 1" (click)="goToPage(r.page - 1)">
-            Previous
-        </button>
-        Page {{ r.page }} of {{ r.totalPages }} ({{ r.totalCount }} tickets)
-        <button type="button" [disabled]="r.page >= r.totalPages" (click)="goToPage(r.page + 1)">
-            Next
-        </button>
-    </div>
-</ng-container>
+    <ng-container matColumnDef="subject">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Subject</th>
+      <td mat-cell *matCellDef="let ticket" [title]="ticket.subject">{{ ticket.subject }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let ticket">
+        <span class="badge" [attr.data-value]="ticket.status">{{ ticket.status }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="priority">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
+      <td mat-cell *matCellDef="let ticket">
+        <span class="badge" [attr.data-value]="ticket.priority">{{ ticket.priority }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+      <td mat-cell *matCellDef="let ticket">{{ ticket.createdAt | date: 'dd MMM yyyy, HH:mm' }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let ticket; columns: displayedColumns" class="clickable-row"
+      [routerLink]="['/tickets', ticket.id]"></tr>
+  </table>
+
+  <mat-paginator [length]="r.totalCount" [pageIndex]="r.page - 1" [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons (page)="onPage($event)" />
+  }
+</mat-card>
+}

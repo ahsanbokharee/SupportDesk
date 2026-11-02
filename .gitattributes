@@ -1,0 +1,3 @@
+# Store text files with LF in the repository.
+# Git converts to each machine's line endings on checkout and back to LF on commit.
+* text=auto

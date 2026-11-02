@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { Ticket, TicketService } from './services/ticket';
 import { AuthService } from './services/auth';
 import { Router } from '@angular/router';
+import { NotificationService } from './services/notification';
 
 
 @Component({
@@ -15,9 +14,11 @@ import { Router } from '@angular/router';
 export class App {
   auth = inject(AuthService);
   private router = inject(Router);
+  private notify = inject(NotificationService);
 
   logout() {
     this.auth.logout();
+    this.notify.success('You have been logged out');  
     this.router.navigate(['/login']);
   }
 
