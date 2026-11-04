@@ -13,10 +13,9 @@
       <a routerLink="/tickets">Tickets</a>
       <mat-icon>chevron_right</mat-icon>
       <span class="mono">{{ t.ticketNumber }}</span>
-      <button mat-icon-button class="copy" type="button" 
-        [cdkCopyToClipboard]="t.ticketNumber" 
-        (cdkCopyToClipboardCopied)="copied($event, t.ticketNumber)"
-        matTooltip="Copy ticket number" aria-label="Copy ticket number">
+      <button mat-icon-button class="copy" type="button" [cdkCopyToClipboard]="t.ticketNumber"
+        (cdkCopyToClipboardCopied)="copied($event, t.ticketNumber)" matTooltip="Copy ticket number"
+        aria-label="Copy ticket number">
         <mat-icon>content_copy</mat-icon>
       </button>
     </nav>
@@ -25,6 +24,9 @@
 
     <div class="meta">
       <span class="badge" [attr.data-value]="t.status">{{ t.status }}</span>
+      <span class="cat-label">
+        <span class="cat-dot" [style.background]="t.categoryColor"></span>{{ t.categoryName }}
+      </span>
       <span>Opened {{ t.createdAt | date: 'dd MMM yyyy, HH:mm' }}</span>
     </div>
   </div>
@@ -58,6 +60,18 @@
 
         <dt>Ticket</dt>
         <dd class="mono">{{ t.ticketNumber }}</dd>
+        
+        <dt>Category</dt>
+        <dd>
+          <span class="cat-label">
+            <span class="cat-dot" [style.background]="t.categoryColor"></span>{{ t.categoryName }}
+          </span>
+        </dd>
+
+        @if (t.previousNumbers.length) {
+        <dt>Previously</dt>
+        <dd class="mono">{{ t.previousNumbers.join(', ') }}</dd>
+        }
       </dl>
     </mat-card-content>
   </mat-card>
