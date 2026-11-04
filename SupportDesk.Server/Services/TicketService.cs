@@ -14,8 +14,28 @@ public class TicketService : ITicketService
     {
         _db = db;
     }
+    // One place that says how a Ticket (+ its Category) becomes a TicketDto.
+    // Expression that helps EF translate it into the SQL SELECT (with a JOIN to Categories).
+    private static readonly Expression<Func<Ticket, TicketDto>> ToDto = t => new TicketDto
+    {
+        Id = t.Id,
+        TicketNumber = t.TicketNumber,
+        Subject = t.Subject,
+        Description = t.Description,
+        Status = t.Status,
+        Priority = t.Priority,
+        CreatedAt = t.CreatedAt,
+        CategoryId = t.CategoryId,
+        CategoryName = t.Category.Name,
+        CategoryColor = t.Category.Color,
+        PreviousNumbers = t.Aliases
+            .OrderBy(a => a.CreatedAt)
+            .Select(a => a.TicketNumber)
+            .ToList(),
+    };
 
-    public async Task<PagedResult<Ticket>> GetAllAsync(TicketQuery query)
+
+    public async Task<PagedResult<TicketDto>> GetAllAsync(TicketQuery query)
     {
         IQueryable<Ticket> tickets = _db.Tickets;
 
@@ -23,7 +43,9 @@ public class TicketService : ITicketService
         {
             var search = query.Search.Trim();
             tickets = tickets.Where(t =>
-                t.Subject.Contains(search) || t.TicketNumber.Contains(search));
+                t.Subject.Contains(search)
+                || t.TicketNumber.Contains(search)
+                || t.Aliases.Any(a => a.TicketNumber.Contains(search)));
         }
 
         if (!string.IsNullOrEmpty(query.Status))
@@ -34,6 +56,10 @@ public class TicketService : ITicketService
         if (!string.IsNullOrEmpty(query.Priority))
         {
             tickets = tickets.Where(t => t.Priority == query.Priority);
+        }
+        if (query.CategoryId is int categoryId)
+        {
+            tickets = tickets.Where(t => t.CategoryId == categoryId);
         }
 
         var totalCount = await tickets.CountAsync();
@@ -58,9 +84,10 @@ public class TicketService : ITicketService
             .ThenByDescending(t => t.Id)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
+            .Select(ToDto)
             .ToListAsync();
 
-        return new PagedResult<Ticket>
+        return new PagedResult<TicketDto>
         {
             Items = items,
             Page = query.Page,
@@ -69,32 +96,48 @@ public class TicketService : ITicketService
         };
     }
 
-    public async Task<Ticket?> GetByIdAsync(int id)
+    public async Task<TicketDto?> GetByIdAsync(int id)
     {
-        return await _db.Tickets.FindAsync(id);
+        return await _db.Tickets
+                .Where(t => t.Id == id)
+                .Select(ToDto)
+                .FirstOrDefaultAsync();
     }
 
-    public async Task<Ticket> CreateAsync(CreateTicketDto dto)
+    public async Task<TicketDto> CreateAsync(CreateTicketDto dto)
     {
+        var category = dto.CategoryId is int id
+                ? await _db.Categories.SingleAsync(c => c.Id == id)
+                : await _db.Categories.SingleAsync(c => c.IsDefault);
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
+        // Take the next number for this category in ONE statement. The UPDATE locks the
+        // category's row until the transaction ends, so a second request creating a ticket
+        // in the same category waits here; two tickets can never get the same number.
+        //var numbers = await TakeNextNumberAsync(category.Id);
+        var number = await TakeNextNumberAsync(category.Id);
+
         var ticket = new Ticket
         {
             Subject = dto.Subject,
             Description = dto.Description,
             Priority = dto.Priority,
             Status = "Open",
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CategoryId = category.Id,
+            Number = number,
+            TicketNumber = $"{category.Prefix}-{number}",
         };
 
         _db.Tickets.Add(ticket);
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();   // only now are the number AND the ticket saved, together
 
-        ticket.TicketNumber = $"TCK-{1000 + ticket.Id}";
-        await _db.SaveChangesAsync();
-
-        return ticket;
+        return (await GetByIdAsync(ticket.Id))!;
     }
 
-    public async Task<Ticket?> UpdateAsync(int id, UpdateTicketDto dto)
+    public async Task<TicketDto?> UpdateAsync(int id, UpdateTicketDto dto)
     {
         var ticket = await _db.Tickets.FindAsync(id);
         if (ticket == null)
@@ -102,13 +145,52 @@ public class TicketService : ITicketService
             return null;
         }
 
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
+        if (ticket.CategoryId != dto.CategoryId)
+        {
+            var newCategory = await _db.Categories.SingleAsync(c => c.Id == dto.CategoryId);
+
+            // Has this ticket been in the target category before? Then it already owns a key there.
+            var keyFromEarlierVisit = await _db.TicketAliases
+                .SingleOrDefaultAsync(a => a.TicketId == ticket.Id && a.CategoryId == newCategory.Id);
+
+            int number;
+            if (keyFromEarlierVisit is not null)
+            {
+                // Returning: restore the old key (BILL-3 comes back) and stop treating it as an alias.
+                number = keyFromEarlierVisit.Number;
+                _db.TicketAliases.Remove(keyFromEarlierVisit);
+            }
+            else
+            {
+                // First visit to this category: take its next number.
+                number = await TakeNextNumberAsync(newCategory.Id);
+            }
+
+            // The key it is leaving becomes an alias, so it still finds the ticket.
+            _db.TicketAliases.Add(new TicketAlias
+            {
+                TicketId = ticket.Id,
+                CategoryId = ticket.CategoryId,
+                Number = ticket.Number,
+                TicketNumber = ticket.TicketNumber,
+                CreatedAt = DateTime.UtcNow,
+            });
+
+            ticket.CategoryId = newCategory.Id;
+            ticket.Number = number;
+            ticket.TicketNumber = $"{newCategory.Prefix}-{number}";
+        }
         ticket.Subject = dto.Subject;
         ticket.Description = dto.Description;
         ticket.Priority = dto.Priority;
         ticket.Status = dto.Status;
 
         await _db.SaveChangesAsync();
-        return ticket;
+        await transaction.CommitAsync();
+
+        return await GetByIdAsync(id);
     }
 
     private static IOrderedQueryable<Ticket> SortTickets<TKey>(
@@ -117,5 +199,39 @@ public class TicketService : ITicketService
         bool descending)
     {
         return descending ? tickets.OrderByDescending(key) : tickets.OrderBy(key);
+    }
+    public async Task<string?> ValidateCategoryAsync(int? categoryId, int? ticketId = null)
+    {
+        if (categoryId is null)
+        {
+            return null;                       // create without a category → default is used
+        }
+
+        var category = await _db.Categories.FindAsync(categoryId.Value);
+        if (category is null)
+        {
+            return "That category does not exist.";
+        }
+
+        if (category.IsActive)
+        {
+            return null;
+        }
+
+        // An inactive category is only allowed if the ticket is already in it
+        // (editing a ticket's other fields must keep working after its category is deactivated).
+        var unchanged = ticketId is not null
+            && await _db.Tickets.AnyAsync(t => t.Id == ticketId && t.CategoryId == categoryId);
+
+        return unchanged ? null : "That category is no longer active.";
+    }
+    // Takes the next number in a category. MUST run inside a transaction: the UPDATE locks the
+    // category row until commit/rollback, so concurrent callers queue and never share a number.
+    private async Task<int> TakeNextNumberAsync(int categoryId)
+    {
+        var numbers = await _db.Database
+            .SqlQuery<int>($"UPDATE Categories SET LastNumber = LastNumber + 1 OUTPUT inserted.LastNumber AS [Value] WHERE Id = {categoryId}")
+            .ToListAsync();
+        return numbers.Single();
     }
 }

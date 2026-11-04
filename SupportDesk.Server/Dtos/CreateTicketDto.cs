@@ -14,5 +14,6 @@ public class CreateTicketDto
     public string Description {get; set;} = "";
     [Required]
     [AllowedValues ("Low", "Medium", "High")]
-    public string Priority {get; set;} = "";    
+    public string Priority {get; set;} = "";
+    public int? CategoryId { get; set; }      // null = use the default category (web form, later email)
 }
