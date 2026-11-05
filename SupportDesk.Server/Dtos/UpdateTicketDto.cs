@@ -18,4 +18,6 @@ public class UpdateTicketDto
     [Required]
     [AllowedValues ("Open", "Closed", "In Progress", "Resolved")]
     public string Status {get; set;} = "";
+    [Range(1, int.MaxValue, ErrorMessage = "Choose a category.")]
+    public int CategoryId { get; set; }
 }

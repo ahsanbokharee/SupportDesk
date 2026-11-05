@@ -23,4 +23,5 @@ public class TicketQuery
 
     [AllowedValues(null, "asc", "desc")]
     public string? SortDir { get; set; }
+    public int? CategoryId { get; set; }
 }

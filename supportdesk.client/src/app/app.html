@@ -5,34 +5,35 @@
   </a>
 
   @if (auth.currentUser(); as user) {
-    <nav class="nav">
-      <a mat-button routerLink="/tickets" routerLinkActive="active">Tickets</a>
-      @if (auth.isAdmin()) {
-        <a mat-button routerLink="/users" routerLinkActive="active">Users</a>
-      }
-    </nav>
+  <nav class="nav">
+    <a mat-button routerLink="/tickets" routerLinkActive="active">Tickets</a>
+    @if (auth.isAdmin()) {
+    <a mat-button routerLink="/users" routerLinkActive="active">Users</a>
+    <a mat-button routerLink="/categories" routerLinkActive="active">Categories</a>
+    }
+  </nav>
 
-    <span class="spacer"></span>
+  <span class="spacer"></span>
 
-    <button mat-button [matMenuTriggerFor]="userMenu">
-      <mat-icon>account_circle</mat-icon>
-      {{ user.fullName }}
-      <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+  <button mat-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+    {{ user.fullName }}
+    <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+  </button>
+
+  <mat-menu #userMenu="matMenu" xPosition="before">
+    <div class="menu-header" (click)="$event.stopPropagation()">
+      <strong>{{ user.fullName }}</strong>
+      <small>{{ user.role }}</small>
+    </div>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Log out</span>
     </button>
-
-    <mat-menu #userMenu="matMenu" xPosition="before">
-      <div class="menu-header" (click)="$event.stopPropagation()">
-        <strong>{{ user.fullName }}</strong>
-        <small>{{ user.role }}</small>
-      </div>
-      <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Log out</span>
-      </button>
-    </mat-menu>
+  </mat-menu>
   } @else {
-    <span class="spacer"></span>
-    <a mat-button routerLink="/login">Log in</a>
+  <span class="spacer"></span>
+  <a mat-button routerLink="/login">Log in</a>
   }
 </mat-toolbar>
 

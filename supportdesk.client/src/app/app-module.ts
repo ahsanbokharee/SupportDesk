@@ -12,9 +12,21 @@ import { authInterceptor } from './services/auth-interceptor';
 import { UserList } from './users/user-list/user-list';
 import { UserForm } from './users/user-form/user-form';
 import { MaterialModule } from './material-module';
+import { CategoryList } from './categories/category-list/category-list';
+import { CategoryForm } from './categories/category-form/category-form';
 
 @NgModule({
-  declarations: [App, TicketList, TicketDetail, TicketForm, Login, UserList, UserForm],
+  declarations: [
+    App,
+    TicketList,
+    TicketDetail,
+    TicketForm,
+    Login,
+    UserList,
+    UserForm,
+    CategoryList,
+    CategoryForm,
+  ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, MaterialModule],
   providers: [
     provideBrowserGlobalErrorListeners(),

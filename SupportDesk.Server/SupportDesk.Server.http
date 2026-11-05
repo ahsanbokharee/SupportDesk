@@ -223,3 +223,378 @@ Content-Type: application/json
   "role": "Admin",
   "isActive": false
 }
+
+
+###############################################################
+### CATEGORIES + PER-CATEGORY NUMBERING
+### Run "Login as admin" and "Login as agent" above first.
+### Run these IN ORDER the first time: later requests use ids
+### captured from earlier responses (# @name ... response.body.id).
+###############################################################
+
+### 1. List categories (expect 200: General / GEN, isDefault true, ticketsIssued = old ticket count)
+GET {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+
+### 2. Create Billing (expect 201, ticketsIssued 0)
+# @name billing
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Billing",
+  "prefix": "BILL",
+  "defaultPriority": "Medium",
+  "color": "#1e88e5"
+}
+
+###
+@billingId = 2
+# @billingId = {{billing.response.body.id}}
+
+
+### 3. Same prefix again (expect 409 "prefix BILL is already used")
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Billing copy",
+  "prefix": "BILL",
+  "defaultPriority": "Low",
+  "color": "#1e88e5"
+}
+
+### 4. Lowercase prefix (expect 400 "Prefix must be 2 to 6 capital letters")
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Lowercase",
+  "prefix": "low",
+  "defaultPriority": "Low",
+  "color": "#1e88e5"
+}
+
+### 5. Prefix too long (expect 400)
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Too long",
+  "prefix": "TOOLONGX",
+  "defaultPriority": "Low",
+  "color": "#1e88e5"
+}
+
+### 6. Bad colour (expect 400 "Colour must be a hex value")
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Bad colour",
+  "prefix": "BADC",
+  "defaultPriority": "Low",
+  "color": "blue"
+}
+
+### 7. Agent tries to create a category (expect 403)
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "name": "Agent made",
+  "prefix": "AGT",
+  "defaultPriority": "Low",
+  "color": "#1e88e5"
+}
+
+### 8. Agent can READ categories (expect 200)
+GET {{baseUrl}}/api/categories
+Authorization: Bearer {{agentToken}}
+
+### 9. First Billing ticket (expect 201, ticketNumber "BILL-1", categoryName "Billing")
+# @name billTicket
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Invoice shows the wrong amount",
+  "description": "October invoice charged twice.",
+  "priority": "High",
+  "categoryId": {{billingId}}
+}
+
+###
+@billTicketId = 1013
+# @billTicketId = {{billTicket.response.body.id}}
+
+### 10. Second Billing ticket (expect "BILL-2")
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Need a copy of last year's receipts",
+  "description": "For the audit.",
+  "priority": "Low",
+  "categoryId": {{billingId}}
+}
+
+### 11. No categoryId (expect "GEN-<next>": the default category)
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "General question",
+  "description": "No category chosen.",
+  "priority": "Medium"
+}
+
+### 12. Category that doesn't exist (expect 400 "That category does not exist.")
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Ghost category",
+  "description": "Should fail.",
+  "priority": "Low",
+  "categoryId": 99999
+}
+
+### 13. Billing now shows ticketsIssued 2
+GET {{baseUrl}}/api/categories/{{billingId}}
+Authorization: Bearer {{adminToken}}
+
+### 14. Change Billing's prefix now that it has tickets (expect 400 "prefix can't change")
+PUT {{baseUrl}}/api/categories/{{billingId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Billing",
+  "prefix": "BIL",
+  "defaultPriority": "Medium",
+  "color": "#1e88e5",
+  "isActive": true
+}
+
+### 15. Rename Billing, same prefix (expect 200: names can always change)
+PUT {{baseUrl}}/api/categories/{{billingId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Billing & Payments",
+  "prefix": "BILL",
+  "defaultPriority": "Medium",
+  "color": "#1e88e5",
+  "isActive": true
+}
+
+### 16. Deactivate the default category (expect 400 "default category can't be deactivated")
+PUT {{baseUrl}}/api/categories/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "General",
+  "prefix": "GEN",
+  "defaultPriority": "Medium",
+  "color": "#607d8b",
+  "isActive": false
+}
+
+### 17. Create Hardware (expect 201)
+# @name hardware
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Hardware",
+  "prefix": "HW",
+  "defaultPriority": "High",
+  "color": "#e53935"
+}
+
+###
+@hardwareId = 3
+# @hardwareId = {{hardware.response.body.id}}
+
+### 18. Change Hardware's prefix while it has NO tickets (expect 200: still allowed)
+PUT {{baseUrl}}/api/categories/{{hardwareId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Hardware",
+  "prefix": "HWR",
+  "defaultPriority": "High",
+  "color": "#e53935",
+  "isActive": true
+}
+
+### 19. Deactivate Hardware (expect 200, isActive false)
+PUT {{baseUrl}}/api/categories/{{hardwareId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Hardware",
+  "prefix": "HWR",
+  "defaultPriority": "High",
+  "color": "#e53935",
+  "isActive": false
+}
+
+### 20. New ticket in the inactive category (expect 400 "That category is no longer active.")
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Keyboard broken",
+  "description": "Should fail: category inactive.",
+  "priority": "High",
+  "categoryId": {{hardwareId}}
+}
+
+### 21. Agent asks for inactive categories (expect 200, Hardware NOT in the list)
+GET {{baseUrl}}/api/categories?includeInactive=true
+Authorization: Bearer {{agentToken}}
+
+### 22. Admin asks for inactive categories (expect 200, Hardware IS in the list)
+GET {{baseUrl}}/api/categories?includeInactive=true
+Authorization: Bearer {{adminToken}}
+
+### 23. Filter tickets by category (expect only BILL- tickets)
+GET {{baseUrl}}/api/tickets?categoryId={{billingId}}
+Authorization: Bearer {{agentToken}}
+
+### 24. Search by the new number format (expect BILL-1 and BILL-2)
+GET {{baseUrl}}/api/tickets?search=BILL-
+Authorization: Bearer {{agentToken}}
+
+### 25. Ticket detail (expect categoryName "Billing & Payments", categoryColor "#1e88e5")
+GET {{baseUrl}}/api/tickets/{{billTicketId}}
+Authorization: Bearer {{agentToken}}
+
+### 26. Update WITHOUT categoryId (expect 400 "Choose a category." from [Range])
+PUT {{baseUrl}}/api/tickets/{{billTicketId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Invoice shows the wrong amount",
+  "description": "October invoice charged twice.",
+  "priority": "High",
+  "status": "In Progress"
+}
+
+### 27. New Billing ticket to move (expect BILL-n)
+# @name moveMe
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Refund request",
+  "description": "Customer wants a refund for a duplicate charge.",
+  "priority": "Medium",
+  "categoryId": {{billingId}}
+}
+
+###
+@moveMeId = {{moveMe.response.body.id}}
+@moveMeNumber = {{moveMe.response.body.ticketNumber}}
+
+### 28. Move it to General (expect 200: ticketNumber "GEN-<next>", previousNumbers [the BILL key], categoryName "General")
+PUT {{baseUrl}}/api/tickets/{{moveMeId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Refund request",
+  "description": "Customer wants a refund for a duplicate charge.",
+  "priority": "Medium",
+  "status": "Open",
+  "categoryId": 1
+}
+
+### 29. Same PUT again (expect 200, SAME ticketNumber, still ONE previous number: idempotent)
+PUT {{baseUrl}}/api/tickets/{{moveMeId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Refund request",
+  "description": "Customer wants a refund for a duplicate charge.",
+  "priority": "Medium",
+  "status": "Open",
+  "categoryId": 1
+}
+
+### 30. Search by the OLD key (expect the ticket, now shown with its GEN number)
+GET {{baseUrl}}/api/tickets?search={{moveMeNumber}}
+Authorization: Bearer {{agentToken}}
+
+### 31. Move it back to Billing (expect its ORIGINAL BILL key again, previousNumbers [GEN-m] only)
+PUT {{baseUrl}}/api/tickets/{{moveMeId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Refund request",
+  "description": "Customer wants a refund for a duplicate charge.",
+  "priority": "Medium",
+  "status": "Open",
+  "categoryId": {{billingId}}
+}
+
+### 32. Try to move it into the inactive Hardware category (expect 400 "no longer active", key unchanged)
+PUT {{baseUrl}}/api/tickets/{{moveMeId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Refund request",
+  "description": "Customer wants a refund for a duplicate charge.",
+  "priority": "Medium",
+  "status": "Open",
+  "categoryId": {{hardwareId}}
+}
+
+### 33. Fix the leftover BILL-1 that sits in General: move it to Billing (expect BILL-<next>, previousNumbers ["BILL-1"])
+PUT {{baseUrl}}/api/tickets/{{billTicketId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Invoice shows the wrong amount",
+  "description": "October invoice charged twice.",
+  "priority": "High",
+  "status": "In Progress",
+  "categoryId": {{billingId}}
+}
+
+### 34. Move the test-27 ticket to General again (expect the SAME GEN key as test 28, no new number)
+PUT {{baseUrl}}/api/tickets/{{moveMeId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "subject": "Refund request",
+  "description": "Customer wants a refund for a duplicate charge.",
+  "priority": "Medium",
+  "status": "Open",
+  "categoryId": 1
+}

@@ -109,3 +109,24 @@ input::-ms-clear {
 .mat-mdc-snack-bar-container.snack {
   margin-top: 72px;
 }
+/* ---------- Category label: coloured dot + name ---------- */
+.cat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cat-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.cat-prefix {
+  margin-left: 6px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  opacity: 0.6;
+}

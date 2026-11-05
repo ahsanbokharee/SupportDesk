@@ -81,3 +81,13 @@ table {
 .error {
   color: var(--mat-sys-error, #b3261e);
 }
+
+.mat-column-category {
+  width: 160px;
+}
+
+.mat-column-category .cat-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

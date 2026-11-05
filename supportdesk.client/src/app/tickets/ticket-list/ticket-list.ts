@@ -5,6 +5,8 @@ import { debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
+import { Category, CategoryService } from '../../services/category';
+
 
 @Component({
   selector: 'app-ticket-list',
@@ -17,11 +19,13 @@ export class TicketList implements OnInit {
   private ticketService = inject(TicketService);
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private categoryService = inject(CategoryService);
+  categories = signal<Category[]>([]);
 
   statuses = ['Open', 'In Progress', 'Resolved', 'Closed'];
   priorities = ['Low', 'Medium', 'High'];
   pageSize = signal(10);
-  displayedColumns = ['ticketNumber', 'subject', 'status', 'priority', 'createdAt'];
+  displayedColumns = ['ticketNumber', 'category', 'subject', 'status', 'priority', 'createdAt'];
 
   result = signal<PagedResult<Ticket> | null>(null);
   page = signal(1);
@@ -34,6 +38,7 @@ export class TicketList implements OnInit {
     search: [''],
     status: [''],
     priority: [''],
+    categoryId: this.fb.control<number | null>(null),   // ← new
   });
 
   ngOnInit() {
@@ -43,6 +48,8 @@ export class TicketList implements OnInit {
         this.page.set(1);
         this.load();
       });
+
+    this.categoryService.getCategories().subscribe(c => this.categories.set(c));
 
     this.load();
   }
@@ -89,5 +96,9 @@ export class TicketList implements OnInit {
     this.page.set(event.pageIndex + 1);
     this.pageSize.set(event.pageSize);
     this.load();
+  }
+  selectedFilterCategory() {
+    const id = this.filters.controls.categoryId.value;
+    return this.categories().find(c => c.id === id);
   }
 }
