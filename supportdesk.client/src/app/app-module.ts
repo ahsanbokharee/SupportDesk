@@ -3,35 +3,40 @@ import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
-import { TicketList } from './tickets/ticket-list/ticket-list';
-import { TicketDetail } from './tickets/ticket-detail/ticket-detail';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TicketForm } from './tickets/ticket-form/ticket-form';
 import { Login } from './auth/login/login';
 import { authInterceptor } from './services/auth-interceptor';
-import { UserList } from './users/user-list/user-list';
-import { UserForm } from './users/user-form/user-form';
-import { MaterialModule } from './material-module';
-import { CategoryList } from './categories/category-list/category-list';
-import { CategoryForm } from './categories/category-form/category-form';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
     App,
-    TicketList,
-    TicketDetail,
-    TicketForm,
     Login,
-    UserList,
-    UserForm,
-    CategoryList,
-    CategoryForm,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, MaterialModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+  ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([authInterceptor])),
   ],
   bootstrap: [App],
 })
-export class AppModule {}
+export class AppModule { }
