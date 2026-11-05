@@ -1,50 +1,30 @@
-import { Component, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { TicketList } from './tickets/ticket-list/ticket-list';
-import { TicketDetail } from './tickets/ticket-detail/ticket-detail';
-import { TicketForm } from './tickets/ticket-form/ticket-form';
 import { Login } from './auth/login/login';
 import { adminGuard, authGuard } from './services/auth-guard';
-import { UserList } from './users/user-list/user-list';
-import { UserForm } from './users/user-form/user-form';
-import { CategoryList } from './categories/category-list/category-list';
-import { CategoryForm } from './categories/category-form/category-form';
 
 const routes: Routes = [
   { path: '', redirectTo: 'tickets', pathMatch: 'full' },
   { path: 'login', component: Login },
   {
     path: 'tickets',
-    canActivate: [authGuard],
-    children: [
-      { path: '', component: TicketList },
-      { path: 'new', component: TicketForm },
-      { path: ':id/edit', component: TicketForm },
-      { path: ':id', component: TicketDetail }
-    ]
+    canMatch: [authGuard],
+    loadChildren: () => import('./tickets/tickets-module').then(m => m.TicketsModule),
   },
   {
     path: 'users',
-    canActivate: [authGuard, adminGuard],
-    children: [
-      { path: '', component: UserList },
-      { path: 'new', component: UserForm },
-      { path: ':id/edit', component: UserForm },
-    ],
+    canMatch: [authGuard, adminGuard],
+    loadChildren: () => import('./users/users-module').then(m => m.UsersModule),
   },
-    {
+  {
     path: 'categories',
-    canActivate: [authGuard, adminGuard],
-    children: [
-      { path: '', component: CategoryList },
-      { path: 'new', component: CategoryForm },
-      { path: ':id/edit', component: CategoryForm },
-    ],
+    canMatch: [authGuard, adminGuard],
+    loadChildren: () => import('./categories/categories-module').then(m => m.CategoriesModule),
   },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule { }

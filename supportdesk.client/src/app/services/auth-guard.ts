@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanMatchFn, Router } from '@angular/router';
 import { AuthService } from './auth';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanMatchFn = (route, segments) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -10,12 +10,13 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
+  const returnUrl = '/' + segments.map(s => s.path).join('/');
   return router.createUrlTree(['/login'], {
-    queryParams: { returnUrl: state.url },
+    queryParams: { returnUrl },
   });
-
 };
-export const adminGuard: CanActivateFn = () => {
+
+export const adminGuard: CanMatchFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -24,5 +25,4 @@ export const adminGuard: CanActivateFn = () => {
   }
 
   return router.createUrlTree(['/tickets']);
-
 };
