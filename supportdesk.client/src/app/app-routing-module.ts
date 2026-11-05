@@ -7,6 +7,8 @@ import { Login } from './auth/login/login';
 import { adminGuard, authGuard } from './services/auth-guard';
 import { UserList } from './users/user-list/user-list';
 import { UserForm } from './users/user-form/user-form';
+import { CategoryList } from './categories/category-list/category-list';
+import { CategoryForm } from './categories/category-form/category-form';
 
 const routes: Routes = [
   { path: '', redirectTo: 'tickets', pathMatch: 'full' },
@@ -28,6 +30,15 @@ const routes: Routes = [
       { path: '', component: UserList },
       { path: 'new', component: UserForm },
       { path: ':id/edit', component: UserForm },
+    ],
+  },
+    {
+    path: 'categories',
+    canActivate: [authGuard, adminGuard],
+    children: [
+      { path: '', component: CategoryList },
+      { path: 'new', component: CategoryForm },
+      { path: ':id/edit', component: CategoryForm },
     ],
   },
 ];
